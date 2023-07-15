@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import React from 'react';
 import {useTodo} from '@/hooks/useTodo';
 import {ReadyState} from 'react-use-websocket';
-import Board from '@/app/board/page';
+import Board from '@/app/(menu)/board/page';
 
 const Todo = () => {
   const {
