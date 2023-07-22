@@ -1,5 +1,5 @@
 namespace ReservationResponse {
-  export type Reservation = {
+  type Reservation = {
     reservationId: number;
     customerId: number;
     storeId: number;
@@ -14,12 +14,14 @@ namespace ReservationResponse {
     cancelType: number | null;
   };
 
+  type WaitTime = {
+    reservationNumber: number;
+    position: number;
+    time: number;
+  }
+
   export type GetWaitTime = {
-    data: {
-      reservationNumber: number;
-      position: number;
-      time: number;
-    }
+    data: WaitTime
   };
 
   export type GetReservations = {
