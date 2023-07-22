@@ -1,5 +1,5 @@
 namespace TodoResponse {
-  export type GetTodo = {
+  export type Todo = {
     id: string;
     title: string;
     completed: boolean;
@@ -7,6 +7,6 @@ namespace TodoResponse {
   };
 
   export type GetAllTodo = {
-    todos: GetTodo[];
+    todos: Todo[];
   };
 }

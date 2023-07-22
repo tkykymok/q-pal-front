@@ -1,5 +1,5 @@
 namespace ReservationResponse {
-  export type GetReservation = {
+  export type Reservation = {
     reservationId: number;
     customerId: number;
     storeId: number;
@@ -23,6 +23,6 @@ namespace ReservationResponse {
   };
 
   export type GetReservations = {
-    reservations: GetReservation[];
+    reservations: Reservation[];
   };
 }
