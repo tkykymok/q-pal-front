@@ -1,6 +1,17 @@
-import RootLayout from '@/app/layout';
+'use client';
+
+import { useReservationKiosk } from '@/hooks/useReservationKiosk';
+import { CardStatus } from '@/constant/CardStatus';
+import IN_PROGRESS = CardStatus.IN_PROGRESS;
+import PENDING = CardStatus.PENDING;
+import WAITING = CardStatus.WAITING;
 
 export default function ReservationKiosk() {
+  const { reservationsMap, waitTime } = useReservationKiosk();
+
+  console.log(reservationsMap);
+  console.log(waitTime);
+
   return (
     <>
       <div className="grid grid-cols-4 gap-4 w-full m-5">
@@ -11,9 +22,15 @@ export default function ReservationKiosk() {
             </div>
           </div>
           <div className="grid grid-cols-5 gap-2 p-2">
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">1</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">2</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">3</div>
+            {reservationsMap &&
+              reservationsMap.get(IN_PROGRESS)?.map((reservation) => (
+                <div
+                  key={reservation.reservationId}
+                  className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl"
+                >
+                  {reservation.reservationNumber}
+                </div>
+              ))}
           </div>
         </div>
 
@@ -24,7 +41,15 @@ export default function ReservationKiosk() {
             </div>
           </div>
           <div className="grid grid-cols-5 gap-2 p-2">
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">4</div>
+            {reservationsMap &&
+              reservationsMap.get(PENDING)?.map((reservation) => (
+                <div
+                  key={reservation.reservationId}
+                  className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl"
+                >
+                  {reservation.reservationNumber}
+                </div>
+              ))}
           </div>
         </div>
 
@@ -36,13 +61,15 @@ export default function ReservationKiosk() {
           </div>
 
           <div className="grid grid-cols-10 gap-2 p-2">
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">5</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">6</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">7</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">8</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">9</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">10</div>
-            <div className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl">11</div>
+            {reservationsMap &&
+              reservationsMap.get(WAITING)?.map((reservation) => (
+                <div
+                  key={reservation.reservationId}
+                  className="flex justify-center items-center w-14 h-14 rounded-md bg-orange-100 text-2xl"
+                >
+                  {reservation.reservationNumber}
+                </div>
+              ))}
           </div>
         </div>
 
@@ -50,10 +77,14 @@ export default function ReservationKiosk() {
           <div className="flex flex-col justify-center w-1/3">
             <div className="flex flex-col items-center space-y-12 py-10 bg-white">
               <div className="text-3xl">次の予約番号</div>
-              <div className="text-5xl font-bold">12</div>
+              <div className="text-5xl font-bold">
+                {waitTime?.reservationNumber}
+              </div>
               <div className="flex flex-col items-center">
-                <p className="text-3xl">8番目のご案内です</p>
-                <p className="text-xl mt-2 text-neutral-600">待ち時間目安：30分〜45分</p>
+                <p className="text-3xl">{waitTime?.position}番目のご案内です</p>
+                <p className="text-xl mt-2 text-neutral-600">
+                  待ち時間目安：{waitTime?.time} 分
+                </p>
               </div>
 
               <div className="flex justify-center w-2/3 p-5 bg-blue-700 rounded-lg shadow-2xl hover:bg-blue-600 cursor-pointer">

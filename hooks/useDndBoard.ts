@@ -1,14 +1,14 @@
-import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
-import {StaffType} from '@/components/features/DndBoard/DndBoard';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { StaffType } from '@/components/features/DndBoard/DndBoard';
 import {
   DragEndEvent,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import {DragStartEvent} from '@dnd-kit/core/dist/types/events';
-import {arrayMove} from '@dnd-kit/sortable';
-import {CardStatus, CardType, ColumnType} from '@/constant/CardStatus';
+import { DragStartEvent } from '@dnd-kit/core/dist/types/events';
+import { arrayMove } from '@dnd-kit/sortable';
+import { CardStatus, CardType, ColumnType } from '@/constant/CardStatus';
 
 interface UseDndBoardReturn {
   activeCard: CardType | null;
@@ -82,7 +82,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 1,
       customerId: 1,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客A',
       menu: 'カット',
     },
@@ -90,7 +90,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 2,
       customerId: 2,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客B',
       menu: 'カット',
     },
@@ -98,7 +98,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 3,
       customerId: 3,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客C',
       menu: 'カット',
     },
@@ -106,7 +106,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 4,
       customerId: 4,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客D',
       menu: 'カット',
     },
@@ -114,7 +114,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 5,
       customerId: 5,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -122,7 +122,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 6,
       customerId: 6,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -130,7 +130,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 7,
       customerId: 7,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -138,7 +138,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 8,
       customerId: 8,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -146,7 +146,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 9,
       customerId: 9,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -154,7 +154,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 10,
       customerId: 10,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -162,7 +162,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 11,
       customerId: 11,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -170,7 +170,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 12,
       customerId: 12,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -178,7 +178,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 13,
       customerId: 13,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -186,7 +186,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 14,
       customerId: 14,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -194,7 +194,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 15,
       customerId: 15,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -202,7 +202,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 16,
       customerId: 16,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -210,7 +210,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 17,
       customerId: 17,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客E',
       menu: 'カット',
     },
@@ -218,7 +218,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       reservationNo: 18,
       customerId: 18,
       staffId: null,
-      status: 'waiting',
+      status: 'Waiting',
       name: '顧客Z',
       menu: 'カット',
     },
@@ -273,9 +273,8 @@ export const useDndBoard = (): UseDndBoardReturn => {
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-
-  const handleDragStart = ({active}: DragStartEvent) => {
-    const {type: activeType, id: activeId} = extractInfo(
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    const { type: activeType, id: activeId } = extractInfo(
       active.id.toString()
     );
 
@@ -285,14 +284,14 @@ export const useDndBoard = (): UseDndBoardReturn => {
     }
   };
 
-  const handleDragEnd = ({active, over}: DragEndEvent) => {
-    const {type: activeType, id: activeId} = extractInfo(
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    const { type: activeType, id: activeId } = extractInfo(
       active.id.toString()
     );
 
     if (activeType === 'card' && over) {
       // For card dragging
-      const {type: overType, id: overId} = extractInfo(over.id.toString());
+      const { type: overType, id: overId } = extractInfo(over.id.toString());
 
       if (overType === CardStatus.DONE && activeId) {
         if (activeCard?.status !== CardStatus.IN_PROGRESS) {
@@ -302,7 +301,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
 
         setTimeout(() => {
           setIsModalOpen(true);
-        }, 300)
+        }, 300);
       }
 
       updateCardStatus(
@@ -314,7 +313,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       setActiveCard(null);
     } else if (activeType === 'inProgress' && over) {
       // For column dragging
-      const {id: overId} = extractInfo(over.id.toString());
+      const { id: overId } = extractInfo(over.id.toString());
       const oldIndex = columns.findIndex((col) => col.staffId === activeId);
       const newIndex = columns.findIndex((col) => col.staffId === overId);
 
@@ -327,7 +326,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
           );
           // If the staff is found in the columns, update its order
           if (newOrder !== -1) {
-            return {...staff, order: newOrder + 1};
+            return { ...staff, order: newOrder + 1 };
           }
           // If the staff is not found in the columns (not working), keep its original data
           return staff;
@@ -362,7 +361,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
     setCards((prevCards) =>
       prevCards.map((card) =>
         card.customerId === customerId
-          ? {...card, status: newStatus, staffId: staffId}
+          ? { ...card, status: newStatus, staffId: staffId }
           : card
       )
     );
@@ -402,4 +401,4 @@ export const useDndBoard = (): UseDndBoardReturn => {
     handleConfirm,
     handleCancel,
   };
-}
+};

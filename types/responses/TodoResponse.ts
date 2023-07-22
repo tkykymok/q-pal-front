@@ -1,13 +1,12 @@
 namespace TodoResponse {
-
-  export interface GetTodo {
+  export type GetTodo = {
     id: string;
     title: string;
     completed: boolean;
     createdAt: string;
-  }
+  };
 
-  export interface GetAllTodo {
+  export type GetAllTodo = {
     todos: GetTodo[];
-  }
+  };
 }

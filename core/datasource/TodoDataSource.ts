@@ -5,14 +5,14 @@ import AddTodo = TodoRequest.AddTodo;
 import GetAllTodo = TodoResponse.GetAllTodo;
 import { AxiosInstance } from '@/config/axios';
 
-export interface ITodoDatasource {
+export interface ITodoDataSource {
   getAllTodos(): Promise<GetAllTodo>;
 
   addTodo(todo: AddTodo): Promise<BaseResponse>;
 }
 
 @injectable()
-export class TodoDatasource implements ITodoDatasource {
+export class TodoDataSource implements ITodoDataSource {
   constructor(@inject('IAxiosInstance') private axiosInstance: AxiosInstance) {}
 
   async getAllTodos(): Promise<GetAllTodo> {

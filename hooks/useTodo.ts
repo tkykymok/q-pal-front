@@ -1,15 +1,15 @@
-import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
-import useWebSocket from 'react-use-websocket';
 import useSWR from 'swr';
-import {ITodoUsecase} from '@/core/usecases/TodoUsecase';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import useWebSocket from 'react-use-websocket';
+import { ITodoUsecase } from '@/core/usecases/TodoUsecase';
 import container from '@/config/di';
-import {Todo} from '@/types/models/Todo';
-import {FieldValues, useForm} from 'react-hook-form';
-import {UseFormRegister} from 'react-hook-form/dist/types/form';
+import { Todo } from '@/types/models/Todo';
+import { FieldValues, useForm } from 'react-hook-form';
+import { UseFormRegister } from 'react-hook-form/dist/types/form';
 
 const todoUsecase = container.get<ITodoUsecase>('ITodoUsecase');
 
-const fetcher = async () => {
+const fetchAllTodos = async () => {
   const res = await todoUsecase.getAllTodos();
   return res.todos;
 };
@@ -25,16 +25,15 @@ export interface UseTodoReturn {
 }
 
 export const useTodo = (): UseTodoReturn => {
-  const {register, handleSubmit, setValue, getValues} =
-    useForm<FieldValues>({
-      defaultValues: {
-        input: "aaa"
-      }
-    });
+  const { register, handleSubmit, setValue, getValues } = useForm<FieldValues>({
+    defaultValues: {
+      input: 'aaa',
+    },
+  });
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<number | undefined>();
 
-  const {data: todos, error, mutate} = useSWR<Todo[]>('todos', fetcher);
+  const { data: todos, error, mutate } = useSWR<Todo[]>('todos', fetchAllTodos);
 
   const wsTodo = useWebSocket(
     process.env.NEXT_PUBLIC_WEBSOCKET_BASE_URL + '/todo'
@@ -47,8 +46,7 @@ export const useTodo = (): UseTodoReturn => {
     if (wsTodo.lastMessage?.data) {
       const newTodo: Todo = JSON.parse(wsTodo.lastMessage?.data);
       mutate((prev) => (prev ? [...prev, newTodo] : [newTodo]), false).then(
-        (r) => {
-        }
+        (r) => {}
       );
     }
   }, [wsTodo.lastMessage, mutate]);
@@ -92,7 +90,7 @@ export const useTodo = (): UseTodoReturn => {
   );
 
   const handleAddTodo = handleSubmit(async (data) => {
-    const newTodo = {title: data.input};
+    const newTodo = { title: data.input };
     await todoUsecase.addTodo(newTodo);
     setValue('input', '');
   });
@@ -106,4 +104,4 @@ export const useTodo = (): UseTodoReturn => {
     handleInputChange,
     handleAddTodo,
   };
-}
+};

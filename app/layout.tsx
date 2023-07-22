@@ -3,7 +3,7 @@ import './globals.css';
 import MySidebar from '@/components/MySidebar';
 
 export const metadata = {
-  title: 'QMate',
+  title: 'QPal',
 };
 
 interface RootLayoutProps {
