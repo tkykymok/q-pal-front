@@ -1,4 +1,4 @@
-export interface Reservation {
+export type Reservation = {
   reservationId: number;
   customerId: number;
   storeId: number;

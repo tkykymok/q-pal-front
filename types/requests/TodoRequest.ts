@@ -1,6 +1,6 @@
 
 namespace TodoRequest {
-  export interface AddTodo {
+  export type AddTodo = {
     title: string;
   }
 }

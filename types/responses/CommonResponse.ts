@@ -1,6 +1,5 @@
 namespace CommonResponse {
-
-  export interface BaseResponse {
+  export type BaseResponse = {
     message: string;
-  }
+  };
 }
