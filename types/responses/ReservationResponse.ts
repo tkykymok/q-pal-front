@@ -1,4 +1,5 @@
 namespace ReservationResponse {
+  import BaseResponse = CommonResponse.BaseResponse;
   type Reservation = {
     reservationId: number;
     customerId: number;
@@ -18,13 +19,13 @@ namespace ReservationResponse {
     reservationNumber: number;
     position: number;
     time: number;
-  }
-
-  export type GetWaitTime = {
-    data: WaitTime
   };
 
-  export type GetReservations = {
+  export type GetWaitTime = BaseResponse & {
+    data: WaitTime;
+  };
+
+  export type GetReservations = BaseResponse & {
     reservations: Reservation[];
   };
 }

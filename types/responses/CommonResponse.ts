@@ -1,5 +1,5 @@
 namespace CommonResponse {
   export type BaseResponse = {
-    message: string;
+    messages: string[];
   };
 }

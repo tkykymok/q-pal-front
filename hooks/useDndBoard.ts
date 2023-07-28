@@ -9,6 +9,7 @@ import {
 import { DragStartEvent } from '@dnd-kit/core/dist/types/events';
 import { arrayMove } from '@dnd-kit/sortable';
 import { CardStatus, CardType, ColumnType } from '@/constant/CardStatus';
+import IN_PROGRESS = CardStatus.IN_PROGRESS;
 
 interface UseDndBoardReturn {
   activeCard: CardType | null;
@@ -311,7 +312,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
       );
       // @ts-ignore
       setActiveCard(null);
-    } else if (activeType === 'inProgress' && over) {
+    } else if (activeType === IN_PROGRESS && over) {
       // For column dragging
       const { id: overId } = extractInfo(over.id.toString());
       const oldIndex = columns.findIndex((col) => col.staffId === activeId);

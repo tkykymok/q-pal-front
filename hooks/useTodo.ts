@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import useWebSocket from 'react-use-websocket';
 import { ITodoUsecase } from '@/core/usecases/TodoUsecase';
 import container from '@/config/di';
@@ -35,11 +35,15 @@ export const useTodo = (): UseTodoReturn => {
 
   const { data: todos, error, mutate } = useSWR<Todo[]>('todos', fetchAllTodos);
 
+  const userId = useMemo(() => {
+    return Math.floor(Math.random() * 11);
+  }, [])
+
   const wsTodo = useWebSocket(
-    process.env.NEXT_PUBLIC_WEBSOCKET_BASE_URL + '/todo'
+    process.env.NEXT_PUBLIC_WEBSOCKET_BASE_URL + `/todo?userId=1`
   );
   const wsTodoInput = useWebSocket(
-    process.env.NEXT_PUBLIC_WEBSOCKET_BASE_URL + '/todo/input'
+    process.env.NEXT_PUBLIC_WEBSOCKET_BASE_URL + `/todo/input?userId=1`
   );
 
   useEffect(() => {
