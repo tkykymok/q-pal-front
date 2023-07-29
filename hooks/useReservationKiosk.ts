@@ -7,6 +7,7 @@ import { CardStatus } from '@/constant/CardStatus';
 import getCardStatus = CardStatus.getCardStatus;
 import useWebSocket from 'react-use-websocket';
 import CreateReservation = ReservationRequest.CreateReservation;
+import useAppStore from '@/store/AppStore';
 
 const reservationUsecase = container.get<IReservationUsecase>(
   'IReservationUsecase'
@@ -29,31 +30,31 @@ const fetchLineEndWaitTime = async () => {
 };
 
 export const useReservationKiosk = () => {
-  const {
-    data: reservations,
-    error: reservationsError,
-    isLoading
-  } = useSWR<Reservation[]>('reservations', fetchTodayReservations);
+  const isLoading = useAppStore((state) => state.isLoading);
+  const setLoading = useAppStore((state) => state.setLoading);
 
-  const {
-    data: waitTime,
-  } = useSWR<WaitTime>('lineEndWaitTime', fetchLineEndWaitTime);
+  const { data: reservations, error: reservationsError, isLoading: reservationsLoading } = useSWR<
+    Reservation[]
+  >('reservations', fetchTodayReservations);
+
+  const { data: waitTime } = useSWR<WaitTime>(
+    'lineEndWaitTime',
+    fetchLineEndWaitTime
+  );
 
   const wsReservation = useWebSocket(
     process.env.NEXT_PUBLIC_WEBSOCKET_BASE_URL + `/reservation?storeId=2`
   );
 
   useEffect(() => {
-    console.log(reservations)
-  }, [reservations])
-
-  useEffect(() => {
-    console.log(wsReservation.lastMessage)
     if (wsReservation.lastMessage?.data) {
-      mutate('reservations').then(() => {});
+      setLoading(true)
+      mutate('reservations').then(() => {
+        setLoading(false)
+      });
       mutate('lineEndWaitTime').then(() => {});
     }
-  }, [wsReservation.lastMessage]);
+  }, [setLoading, wsReservation.lastMessage]);
 
   /**
    * ステータス毎予約一覧Map
@@ -71,12 +72,15 @@ export const useReservationKiosk = () => {
   /**
    * 新規予約
    */
-  const createReservation = useCallback(async () => {
+  const createReservation = async () => {
+    setLoading(true);
     const request: CreateReservation = { storeId: 2 };
-    const res = await reservationUsecase.createReservation(request);
-  }, []);
+    await reservationUsecase.createReservation(request);
+    setLoading(false)
+  };
 
   return {
+    isLoading,
     reservationsMap,
     waitTime,
     createReservation,
