@@ -8,10 +8,55 @@ import WAITING = CardStatus.WAITING;
 import useAppStore from '@/store/AppStore';
 import Loading from '@/components/Loading';
 import ReservationCard from '@/components/features/ReservationKiosk/ReservationCard';
+import { useQRCode } from 'next-qrcode';
+import Modal from '@/components/Modal';
 
 export default function ReservationKiosk() {
-  const { isLoading, reservationsMap, waitTime, createReservation } =
-    useReservationKiosk();
+  const {
+    isLoading,
+    reservationNumber,
+    setReservationNumber,
+    qrUrl,
+    setQrUrl,
+    reservationsMap,
+    waitTime,
+    createReservation,
+  } = useReservationKiosk();
+
+  const { Image } = useQRCode();
+
+  const getPrintWindow = (html: any) => {
+    const printWindow = window.open('', '_blank', 'width=600,height=600');
+    printWindow!.document.write(
+      '<html><head><title>Print</title><style>' +
+        // ここに元のページのスタイルを書く
+        '* { box-sizing: border-box; }' +
+        'body { font-family: Arial, sans-serif; }' +
+        '.flex-col {flex-direction: column;}' +
+        '.flex { display: flex; }' +
+        '.items-center { align-items: center; }' +
+        '.w-full { width: 100%; }' +
+        '.text-3xl { font-size: 1.875rem; }' +
+        '.text-5xl { font-size: 3.25rem; }' +
+        '.font-bold { font-weight: bold; }' +
+        '</style></head><body>'
+    );
+    printWindow!.document.write(html);
+    printWindow!.document.write('</body></html>');
+    printWindow!.document.close();
+    return printWindow;
+  };
+
+  const handlePrint = () => {
+    console.log('handlePrint');
+    const printContent = document.getElementById('printContent');
+    const printWindow = getPrintWindow(printContent!.innerHTML);
+    if (printWindow) {
+      printWindow.print();
+      printWindow.close();
+    }
+    setQrUrl(undefined)
+  };
 
   return (
     <>
@@ -101,6 +146,36 @@ export default function ReservationKiosk() {
             </div>
           </div>
         </div>
+
+        <Modal isOpen={!!qrUrl} onOk={handlePrint}>
+          <div id="printContent">
+            <div className="flex flex-col w-full items-center">
+              {reservationNumber && qrUrl && (
+                <>
+                  <div className="text-3xl">予約番号</div>
+                  <div className="text-5xl font-bold">{reservationNumber}</div>
+                  {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                  <Image
+                    text={qrUrl}
+                    options={{
+                      type: 'image/jpeg',
+                      quality: 0.3,
+                      level: 'M',
+                      margin: 3,
+                      scale: 1,
+                      width: 200,
+                      color: {
+                        dark: '#000000',
+                        light: '#FFFFFF',
+                      },
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+          {/*<p className="break-words">{qrUrl}</p>*/}
+        </Modal>
       </div>
     </>
   );

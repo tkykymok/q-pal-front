@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
-import type { ITodoRepository } from '@/core/repository/TodoRepository';
+import type { ITodoRepository } from '@/domain/repository/TodoRepository';
 import AddTodo = TodoRequest.AddTodo;
 import BaseResponse = CommonResponse.BaseResponse;
 import GetAllTodo = TodoResponse.GetAllTodo;

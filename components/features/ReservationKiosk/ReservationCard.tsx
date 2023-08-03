@@ -1,4 +1,4 @@
-import { Reservation } from '@/types/models/Reservation';
+import { Reservation } from '@/domain/types/models/Reservation';
 import { FC } from 'react';
 
 interface ReservationCardProps {

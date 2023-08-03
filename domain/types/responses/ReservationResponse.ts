@@ -26,6 +26,13 @@ namespace ReservationResponse {
   };
 
   export type GetReservations = BaseResponse & {
-    reservations: Reservation[];
+    data: Reservation[];
+  };
+
+  export type CreateReservation = BaseResponse & {
+    data: {
+      reservationNumber: number
+      content: string;
+    }
   };
 }

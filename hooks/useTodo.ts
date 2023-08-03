@@ -1,9 +1,9 @@
 import useSWR from 'swr';
 import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import useWebSocket from 'react-use-websocket';
-import { ITodoUsecase } from '@/core/usecases/TodoUsecase';
+import { ITodoUsecase } from '@/domain/usecases/TodoUsecase';
 import container from '@/config/di';
-import { Todo } from '@/types/models/Todo';
+import { Todo } from '@/domain/types/models/Todo';
 import { FieldValues, useForm } from 'react-hook-form';
 import { UseFormRegister } from 'react-hook-form/dist/types/form';
 

@@ -1,16 +1,21 @@
 import useSWR, { mutate } from 'swr';
 import container from '@/config/di';
-import { IReservationUsecase } from '@/core/usecases/ReservationUsecase';
-import { Reservation, WaitTime } from '@/types/models/Reservation';
-import { useCallback, useEffect, useMemo } from 'react';
+import { IReservationUsecase } from '@/domain/usecases/ReservationUsecase';
+import { Reservation, WaitTime } from '@/domain/types/models/Reservation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CardStatus } from '@/constant/CardStatus';
 import getCardStatus = CardStatus.getCardStatus;
 import useWebSocket from 'react-use-websocket';
 import CreateReservation = ReservationRequest.CreateReservation;
 import useAppStore from '@/store/AppStore';
+import {IAxiosInstance} from '@/config/axios';
 
 const reservationUsecase = container.get<IReservationUsecase>(
   'IReservationUsecase'
+);
+
+const axiosInstance = container.get<IAxiosInstance>(
+  'IAxiosInstance'
 );
 
 /**
@@ -18,7 +23,7 @@ const reservationUsecase = container.get<IReservationUsecase>(
  */
 const fetchTodayReservations = async () => {
   const res = await reservationUsecase.getTodayReservations();
-  return res.reservations;
+  return res.data;
 };
 
 /**
@@ -32,10 +37,14 @@ const fetchLineEndWaitTime = async () => {
 export const useReservationKiosk = () => {
   const isLoading = useAppStore((state) => state.isLoading);
   const setLoading = useAppStore((state) => state.setLoading);
+  const [reservationNumber, setReservationNumber] = useState<number>();
+  const [qrUrl, setQrUrl] = useState<string>();
 
-  const { data: reservations, error: reservationsError, isLoading: reservationsLoading } = useSWR<
-    Reservation[]
-  >('reservations', fetchTodayReservations);
+  const {
+    data: reservations,
+    error: reservationsError,
+    isLoading: reservationsLoading,
+  } = useSWR<Reservation[]>('reservations', fetchTodayReservations);
 
   const { data: waitTime } = useSWR<WaitTime>(
     'lineEndWaitTime',
@@ -48,9 +57,9 @@ export const useReservationKiosk = () => {
 
   useEffect(() => {
     if (wsReservation.lastMessage?.data) {
-      setLoading(true)
+      setLoading(true);
       mutate('reservations').then(() => {
-        setLoading(false)
+        setLoading(false);
       });
       mutate('lineEndWaitTime').then(() => {});
     }
@@ -75,12 +84,28 @@ export const useReservationKiosk = () => {
   const createReservation = async () => {
     setLoading(true);
     const request: CreateReservation = { storeId: 2 };
-    await reservationUsecase.createReservation(request);
-    setLoading(false)
+    try {
+      const response = await reservationUsecase.createReservation(request);
+      setReservationNumber(response.data.reservationNumber);
+      setQrUrl(generateQRUrl(response.data.content));
+    } catch (error) {
+      // エラーハンドリング
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateQRUrl = (text: string) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    return `${baseUrl}/my-reservation?data=${text}`;
   };
 
   return {
     isLoading,
+    reservationNumber,
+    setReservationNumber,
+    qrUrl,
+    setQrUrl,
     reservationsMap,
     waitTime,
     createReservation,

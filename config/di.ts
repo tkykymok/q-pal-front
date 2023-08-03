@@ -1,26 +1,22 @@
 import { Container } from 'inversify';
-import { ITodoUsecase, TodoUsecase } from '@/core/usecases/TodoUsecase';
+import { ITodoUsecase, TodoUsecase } from '@/domain/usecases/TodoUsecase';
 import {
   ITodoRepository,
   TodoRepository,
-} from '@/core/repository/TodoRepository';
+} from '@/domain/repository/TodoRepository';
 import {
   ITodoDataSource,
   TodoDataSource,
-} from '@/core/datasource/TodoDataSource';
+} from '@/domain/datasource/TodoDataSource';
 import { AxiosInstance, IAxiosInstance } from '@/config/axios';
 import {
   IReservationUsecase,
   ReservationUsecase,
-} from '@/core/usecases/ReservationUsecase';
+} from '@/domain/usecases/ReservationUsecase';
 import {
   IReservationRepository,
   ReservationRepository,
-} from '@/core/repository/ReservationRepository';
-import {
-  IReservationDataSource,
-  ReservationDataSource,
-} from '@/core/datasource/ReservationDataSource';
+} from '@/domain/repository/ReservationRepository';
 
 const container = new Container();
 container.bind<IAxiosInstance>('IAxiosInstance').to(AxiosInstance);
@@ -35,8 +31,5 @@ container
 container
   .bind<IReservationRepository>('IReservationRepository')
   .to(ReservationRepository);
-container
-  .bind<IReservationDataSource>('IReservationDataSource')
-  .to(ReservationDataSource);
 
 export default container;

@@ -1,16 +1,17 @@
 import { inject, injectable } from 'inversify';
 import GetReservations = ReservationResponse.GetReservations;
 import GetWaitTime = ReservationResponse.GetWaitTime;
-import type { IReservationRepository } from '@/core/repository/ReservationRepository';
+import type { IReservationRepository } from '@/domain/repository/ReservationRepository';
 import BaseResponse = CommonResponse.BaseResponse;
-import CreateReservation = ReservationRequest.CreateReservation;
+import CreateReservationReq = ReservationRequest.CreateReservation;
+import CreateReservationRes = ReservationResponse.CreateReservation;
 
 export interface IReservationUsecase {
   getTodayReservations(): Promise<GetReservations>;
 
   getLineEndWaitTime(): Promise<GetWaitTime>;
 
-  createReservation(request: CreateReservation) : Promise<BaseResponse>
+  createReservation(request: CreateReservationReq) : Promise<CreateReservationRes>
 }
 
 @injectable()
@@ -27,7 +28,7 @@ export class ReservationUsecase implements IReservationUsecase {
     return this.repository.getLineEndWaitTime();
   }
 
-  createReservation(request: CreateReservation): Promise<CommonResponse.BaseResponse> {
+  createReservation(request: CreateReservationReq): Promise<CreateReservationRes> {
     return this.repository.createReservation(request);
   }
 }
