@@ -1,5 +1,6 @@
 namespace CommonResponse {
-  export type BaseResponse = {
+  export type ApiResponse<T> = {
+    data?: T
     messages: string[];
   };
 }

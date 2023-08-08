@@ -11,9 +11,10 @@ export type Reservation = {
   status: string;
   arrivalFlag: boolean;
   cancelType: number | null;
+  content: string
 }
 
-export type WaitTime = {
+export type WaitingInfo = {
   reservationNumber: number;
   position: number;
   time: number;

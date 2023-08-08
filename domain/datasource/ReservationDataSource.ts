@@ -1,14 +1,14 @@
 // import { inject, injectable } from 'inversify';
 // import { AxiosInstance } from '@/config/axios';
 // import GetReservations = ReservationResponse.GetReservations;
-// import GetWaitTime = ReservationResponse.GetWaitTime;
+// import GetWaitingInfo = ReservationResponse.GetWaitingInfo;
 // import BaseResponse = CommonResponse.BaseResponse;
 // import CreateReservation = ReservationRequest.CreateReservation;
 //
 // export interface IReservationDataSource {
 //   getTodayReservations(): Promise<GetReservations>;
 //
-//   getLineEndWaitTime(): Promise<GetWaitTime>;
+//   getLineEndWaitingInfo(): Promise<GetWaitingInfo>;
 //
 //   createReservation(request: CreateReservation) : Promise<BaseResponse>
 // }
@@ -22,8 +22,8 @@
 //     return response.data;
 //   }
 //
-//   async getLineEndWaitTime(): Promise<GetWaitTime> {
-//     const response = await this.axiosInstance.instance.get('/lineEndWaitTime');
+//   async getLineEndWaitingInfo(): Promise<GetWaitingInfo> {
+//     const response = await this.axiosInstance.instance.get('/lineEndWaitingInfo');
 //     return response.data;
 //   }
 //

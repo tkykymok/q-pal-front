@@ -1,17 +1,20 @@
 import { inject, injectable } from 'inversify';
-import GetReservations = ReservationResponse.GetReservations;
-import GetWaitTime = ReservationResponse.GetWaitTime;
 import type { IReservationRepository } from '@/domain/repository/ReservationRepository';
-import BaseResponse = CommonResponse.BaseResponse;
 import CreateReservationReq = ReservationRequest.CreateReservation;
 import CreateReservationRes = ReservationResponse.CreateReservation;
+import { Reservation, WaitingInfo } from '@/domain/types/models/Reservation';
+import GetMyWaitingInfo = ReservationRequest.GetMyWaitingInfo;
 
 export interface IReservationUsecase {
-  getTodayReservations(): Promise<GetReservations>;
+  getTodayReservations(): Promise<Reservation[]>;
 
-  getLineEndWaitTime(): Promise<GetWaitTime>;
+  getLineEndWaitingInfo(): Promise<WaitingInfo>;
 
-  createReservation(request: CreateReservationReq) : Promise<CreateReservationRes>
+  getMyWaitingInfo(request: GetMyWaitingInfo): Promise<WaitingInfo>;
+
+  createReservation(
+    request: CreateReservationReq
+  ): Promise<CreateReservationRes>;
 }
 
 @injectable()
@@ -20,15 +23,25 @@ export class ReservationUsecase implements IReservationUsecase {
     @inject('IReservationRepository') private repository: IReservationRepository
   ) {}
 
-  getTodayReservations(): Promise<GetReservations> {
-    return this.repository.getTodayReservations();
+  async getTodayReservations(): Promise<Reservation[]> {
+    const response = await this.repository.getTodayReservations();
+    return response.data as Reservation[];
   }
 
-  getLineEndWaitTime(): Promise<GetWaitTime> {
-    return this.repository.getLineEndWaitTime();
+  async getLineEndWaitingInfo(): Promise<WaitingInfo> {
+    const response = await this.repository.getLineEndWaitingInfo();
+    return response.data as WaitingInfo;
   }
 
-  createReservation(request: CreateReservationReq): Promise<CreateReservationRes> {
-    return this.repository.createReservation(request);
+  async getMyWaitingInfo(request: GetMyWaitingInfo): Promise<WaitingInfo> {
+    const response = await this.repository.getMyWaitingInfo(request);
+    return response.data as WaitingInfo;
+  }
+
+  async createReservation(
+    request: CreateReservationReq
+  ): Promise<CreateReservationRes> {
+    const response = await this.repository.createReservation(request);
+    return response.data as CreateReservationRes;
   }
 }
