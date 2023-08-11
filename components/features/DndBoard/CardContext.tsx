@@ -1,31 +1,52 @@
 'use client';
 
-import { FC } from 'react';
-import { CardStatus, CardType } from '@/constant/CardStatus';
+import React, { FC } from 'react';
+import { CardStatus } from '@/constant/CardStatus';
+import { Reservation } from '@/domain/types/models/Reservation';
+import IN_PROGRESS = CardStatus.IN_PROGRESS;
+import WAITING = CardStatus.WAITING;
+import PENDING = CardStatus.PENDING;
+import DONE = CardStatus.DONE;
 
 interface CardContextProps {
-  card: CardType;
+  reservation: Reservation;
   isDraggable: boolean;
   forOverlay?: boolean;
 }
 
-const CardContext: FC<CardContextProps> = ({ card, isDraggable, forOverlay = false }) => {
+const CardContext: FC<CardContextProps> = ({
+  reservation,
+  isDraggable,
+  forOverlay = false,
+}) => {
   return (
     <div
       className={`
-        p-5
+        p-1
         rounded-md
         shadow-xl
         ${forOverlay && 'bg-orange-200'}
         ${!isDraggable && !forOverlay ? 'opacity-60' : ''}
-        ${card.status === CardStatus.WAITING && 'bg-blue-300'}
-        ${card.status === CardStatus.PENDING && 'bg-gray-300'}
-        ${card.status === CardStatus.IN_PROGRESS && 'bg-green-300'}
-        ${card.status === CardStatus.DONE && 'bg-gray-400'}
+        ${reservation.status === WAITING && 'bg-blue-200'}
+        ${reservation.status === PENDING && 'bg-gray-200'}
+        ${reservation.status === IN_PROGRESS && 'bg-green-200'}
+        ${reservation.status === DONE && 'bg-gray-200'}
       `}
-      style={forOverlay ? { transform: "rotate(3deg)" } : {}}
+      style={forOverlay ? { transform: 'rotate(3deg)' } : {}}
     >
-      #{card.reservationNo} : {card.name} / {card.menu}
+      <div className="text-neutral-800 p-3">
+        <div className="flex justify-between">
+          <div>#{reservation.reservationNumber}</div>
+          <div>{reservation.customerName}</div>
+        </div>
+        {(reservation.status === WAITING ||
+          reservation.status === IN_PROGRESS) && (
+          <>
+            <hr className="bg-white my-1" />
+            <div>{reservation.menuName}</div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

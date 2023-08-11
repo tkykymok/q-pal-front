@@ -4,15 +4,22 @@ import React, { FC, useEffect, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import DraggableCard from '@/components/features/DndBoard/DraggableCard';
 import CardContext from '@/components/features/DndBoard/CardContext';
-import { CardStatus, CardType } from '@/constant/CardStatus';
+import { CardStatus } from '@/constant/CardStatus';
 import Status = CardStatus.Status;
+import { Reservation } from '@/domain/types/models/Reservation';
+import WAITING = CardStatus.WAITING;
+import PENDING = CardStatus.PENDING;
+import IN_PROGRESS = CardStatus.IN_PROGRESS;
+import DONE = CardStatus.DONE;
+import CANCELED = CardStatus.CANCELED;
 
 interface ColumnProps {
   status: Status;
   title: string;
   staffId?: number | null;
   onClickHeader?: () => void;
-  cardsList?: CardType[];
+  reservations?: Reservation[];
+  activeCard?: Reservation;
 }
 
 const DroppableColumn: FC<ColumnProps> = ({
@@ -20,7 +27,8 @@ const DroppableColumn: FC<ColumnProps> = ({
   title,
   staffId = null,
   onClickHeader,
-  cardsList = [],
+  reservations = [],
+  activeCard,
 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: staffId ? `${status}-${staffId}` : status,
@@ -34,56 +42,106 @@ const DroppableColumn: FC<ColumnProps> = ({
     setRenderStarted(true);
   }, []);
 
-  const isDraggable = (card: CardType) => {
-    if (status === CardStatus.WAITING) {
-      return cardsList.findIndex((c) => c.customerId === card.customerId) === 0;
-    } else if (status === CardStatus.DONE) {
+  const isDraggable = (card: Reservation) => {
+    if (status === WAITING) {
+      return (
+        reservations.findIndex(
+          (c) => c.reservationId === card.reservationId
+        ) === 0
+      );
+    } else if (status === DONE) {
       return false;
     }
     return true;
   };
 
-  const getCard = (card: CardType) => (
+  const getCard = (card: Reservation) => (
     <div
       className={`
         m-3
         px-5
         w-full
       `}
-      key={card.reservationNo}
+      key={card.reservationId}
     >
       <DraggableCard
-        id={`card-${card.customerId}`}
+        id={`card-${card.reservationId}`}
         status={card.status}
         isDraggable={isDraggable(card)}
       >
-        <CardContext card={card} isDraggable={isDraggable(card)} />
+        <CardContext reservation={card} isDraggable={isDraggable(card)} />
       </DraggableCard>
     </div>
   );
 
   const renderCards = (staffId: number | null | undefined) => {
     switch (status) {
-      case CardStatus.IN_PROGRESS:
-        return cardsList.map((card) => {
+      case IN_PROGRESS:
+        return reservations.map((card) => {
           if (card.staffId === staffId) {
             return getCard(card);
           }
           return null; // staffIdが一致しない場合にはnullを返す
         });
       default:
-        return cardsList.map((card) => getCard(card));
+        return reservations.map((card) => getCard(card));
     }
   };
 
+  // カードの合計数を取得する
   const getNumberOfCards = () => {
     switch (status) {
-      case CardStatus.IN_PROGRESS:
-        return cardsList.filter((card) => card.staffId === staffId).length;
+      case IN_PROGRESS:
+        return reservations.filter((card) => card.staffId === staffId).length;
       default:
-        return cardsList.length;
+        return reservations.length;
     }
   };
+
+  const collapsibleStatuses = [CANCELED];
+
+  // Header
+  const HeaderContent = () => (
+    <div className="sticky top-0 bg-white z-10">
+      <div className={`p-5 flex justify-between ${isOver ? 'bg-amber-100' : ''}`} onClick={onClickHeader}>
+        <div className="flex">
+          <div>{title}</div>
+          {collapsibleStatuses.includes(status) && (
+            <span className="transition group-open:rotate-180 cursor-pointer">
+              <svg
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                width="24"
+              >
+                <path d="M6 9l6 6 6-6"></path>
+              </svg>
+            </span>
+          )}
+        </div>
+        <div className="flex">{getNumberOfCards()}</div>
+      </div>
+      <hr />
+    </div>
+  );
+
+  // Content
+  const CardContent = () => (
+    <div ref={setNodeRef} className="flex flex-wrap min-h-24 py-2">
+      {renderCards(staffId)}
+    </div>
+  );
+
+  // 開閉可能Content
+  const CollapsibleContent = () => (
+    <details className="group">
+      <summary className="list-none">
+        <HeaderContent />
+      </summary>
+      <CardContent />
+    </details>
+  );
 
   return (
     <div
@@ -97,30 +155,20 @@ const DroppableColumn: FC<ColumnProps> = ({
         transition-all
         duration-500
         ease-in-out
-        ${isOver ? 'bg-green-100' : ''}
         ${renderStarted ? 'opacity-100' : 'opacity-0'}
-        ${status === CardStatus.WAITING && 'max-h-168'}
-        ${status === CardStatus.PENDING && 'max-h-60'}
+        ${status === WAITING && 'max-h-168'}
+        ${status === DONE && 'max-h-168'}
+        ${status === PENDING && 'max-h-60'}
       `}
     >
-      <div className="sticky top-0 bg-white z-10">
-        <h2 className="p-5 flex justify-between" onClick={onClickHeader}>
-          <div>{title}</div>
-          <div>{getNumberOfCards()}</div>
-        </h2>
-        <hr />
-      </div>
-      <div
-        ref={setNodeRef}
-        className={`
-          flex
-          flex-wrap
-          min-h-24
-          py-2
-        `}
-      >
-        <>{renderCards(staffId)}</>
-      </div>
+      {collapsibleStatuses.includes(status) ? (
+        <CollapsibleContent />
+      ) : (
+        <>
+          <HeaderContent />
+          <CardContent />
+        </>
+      )}
     </div>
   );
 };

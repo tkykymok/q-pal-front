@@ -13,8 +13,8 @@ export default function MyReservation() {
 
   return (
     <>
-      {isLoading || !waitingInfo && <Loading />}
-      {waitingInfo && !waitingInfo.reservationNumber ? (
+      {isLoading && <Loading />}
+      {!waitingInfo || !waitingInfo.reservationNumber ? (
         <div>このURLは無効です</div>
       ) : (
         <div className="grid grid-cols-4 gap-4 w-full p-5">

@@ -11,13 +11,13 @@ import Modal from '@/components/Modal';
 
 interface StaffListAreaProps {
   staffList: StaffType[];
-  setStaffList: (staffList: StaffType[]) => void;
+  setStaffList?: (staffList: StaffType[]) => void;
   servingStaffIdList: (number | null)[];
 }
 
 const StaffListArea: FC<StaffListAreaProps> = ({
   staffList,
-  setStaffList,
+  setStaffList = () => {},
   servingStaffIdList = [],
 }) => {
   const [searchName, setSearchName] = useState('');
@@ -25,8 +25,7 @@ const StaffListArea: FC<StaffListAreaProps> = ({
   const [collapsed, setCollapsed] = useState(true);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  useEffect(() => {
-  }, [collapsed]);
+  useEffect(() => {}, [collapsed]);
 
   const toggleWorkingStatus = (staffId: number) => {
     const workingStaffCount = staffList.filter(
@@ -65,40 +64,25 @@ const StaffListArea: FC<StaffListAreaProps> = ({
     setIsOpenModal(true);
   };
 
+  const ArrowIcon = collapsed ? IoIosArrowBack : IoIosArrowForward;
+  const justifyContent = collapsed ? 'justify-center' : 'justify-start';
+
   return (
     <Sidebar
       collapsed={collapsed}
       collapsedWidth="60px"
       className="bg-blue-300"
     >
-      {collapsed ? (
-        <div className="flex justify-center">
-          <IoIosArrowBack
-            className="h-6 w-6 text-neutral-500 cursor-pointer hover:scale-110"
-            onClick={() => setCollapsed(!collapsed)}
-          />
-        </div>
-      ) : (
+      <div className={`flex ${justifyContent}`}>
+        <ArrowIcon
+          className="h-6 w-6 text-neutral-500 cursor-pointer hover:scale-110"
+          onClick={() => setCollapsed(!collapsed)}
+        />
+      </div>
+
+      {!collapsed && (
         <div className="flex flex-col justify-start">
-          <IoIosArrowForward
-            className="h-6 w-6 text-neutral-500 cursor-pointer hover:scale-110"
-            onClick={() => setCollapsed(!collapsed)}
-          />
-          <form
-            className={`
-              flex
-              items-center
-              justify-between
-              bg-white
-              rounded-md
-              p-2
-              m-3
-              shadow-lg
-              flex-1
-              relative
-              ${collapsed ? 'opacity-0' : ''}
-            `}
-          >
+          <form className="flex items-center justify-between bg-white rounded-md p-2 m-3 shadow-lg flex-1 relative">
             <AiOutlineSearch className="h-6 w-6 text-gray-400" />
             <input
               ref={inputRef}
@@ -109,18 +93,9 @@ const StaffListArea: FC<StaffListAreaProps> = ({
                 setSearchName((event.target as HTMLInputElement).value)
               }
             />
-
             <AiOutlineClose
               onClick={clearSearch}
-              className="
-            h-3
-            w-3
-            text-gray-400
-            cursor-pointer
-            hover:text-gray-500
-            absolute
-            right-2
-          "
+              className="h-3 w-3 text-gray-400 cursor-pointer hover:text-gray-500 absolute right-2"
             />
             <button type="submit" hidden>
               Search
@@ -137,26 +112,12 @@ const StaffListArea: FC<StaffListAreaProps> = ({
           return staff.name.includes(searchName);
         })
         .map((staff) => (
-          <div
-            key={staff.staffId}
-            className="
-              p-3
-              flex
-            "
-          >
-            <div
-              className={`
-                ${collapsed ? 'w-full' : 'w-1/5'}
-                flex items-center
-               `}
-            >
+          <div key={staff.staffId} className="p-3 flex">
+            <div className={collapsed ? 'w-full' : 'w-1/5 flex items-center'}>
               <Image
-                className={`
-                  rounded-full
-                  cursor-pointer
-                  transition-transform
-                  ${staff.isWorking ? 'hover:scale-125' : ''}
-                `}
+                className={`rounded-full cursor-pointer transition-transform ${
+                  staff.isWorking ? 'hover:scale-125' : ''
+                }`}
                 height={34}
                 width={34}
                 alt="Avatar"
@@ -166,50 +127,21 @@ const StaffListArea: FC<StaffListAreaProps> = ({
               />
             </div>
 
-            <Modal
-              isOpen={isOpenModal}
-              onOk={() => {}}
-              onCancel={() => setIsOpenModal(false)}
-              title="休憩時間設定"
-            >
-              <div>Modal Content</div>
-            </Modal>
-
             {!collapsed && (
-              <div
-                className="
-                  w-4/5
-                  flex
-                  items-center
-                  justify-between
-                  mx-3
-                  transition-opacity
-                  duration-500
-                  ease-in
-                  animate-fade-in
-                "
-              >
+              <div className="w-4/5 flex items-center justify-between mx-3">
                 <div>{staff.name}</div>
                 <div>
                   <Switch
                     checked={staff.isWorking}
                     onChange={() => toggleWorkingStatus(staff.staffId)}
                     disabled={isServing(staff.staffId)}
-                    className={`
-                      ${
-                        !staff.isWorking
-                          ? 'bg-gray-200'
-                          : isServing(staff.staffId)
-                          ? 'bg-blue-200'
-                          : 'bg-blue-600'
-                      }
-                      relative
-                      inline-flex
-                      h-6
-                      w-11
-                      items-center
-                      rounded-full
-                    `}
+                    className={`${
+                      !staff.isWorking
+                        ? 'bg-gray-200'
+                        : isServing(staff.staffId)
+                        ? 'bg-blue-200'
+                        : 'bg-blue-600'
+                    } relative inline-flex h-6 w-11 items-center rounded-full`}
                   >
                     <span className="sr-only">Enable notifications</span>
                     <span
@@ -221,6 +153,15 @@ const StaffListArea: FC<StaffListAreaProps> = ({
                 </div>
               </div>
             )}
+
+            <Modal
+              isOpen={isOpenModal}
+              onOk={() => {}}
+              onCancel={() => setIsOpenModal(false)}
+              title="休憩時間設定"
+            >
+              <div>Modal Content</div>
+            </Modal>
           </div>
         ))}
     </Sidebar>

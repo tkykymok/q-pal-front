@@ -1,42 +1,38 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StaffType } from '@/components/features/DndBoard/DndBoard';
 import {
   DragEndEvent,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
 import { DragStartEvent } from '@dnd-kit/core/dist/types/events';
 import { arrayMove } from '@dnd-kit/sortable';
-import { CardStatus, CardType, ColumnType } from '@/constant/CardStatus';
+import { CardStatus, ColumnType } from '@/constant/CardStatus';
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
+import container from '@/config/di';
+import { IReservationUsecase } from '@/domain/usecases/ReservationUsecase';
+import { Reservation } from '@/domain/types/models/Reservation';
+import useSWR from 'swr';
+import getCardStatus = CardStatus.getCardStatus;
+import { isBrowser, isTablet } from 'react-device-detect';
+import DONE = CardStatus.DONE;
+import CANCELED = CardStatus.CANCELED;
 
-interface UseDndBoardReturn {
-  activeCard: CardType | null;
-  setActiveCard: Dispatch<SetStateAction<CardType | null>>;
-  isMounted: boolean;
-  setIsMounted: Dispatch<SetStateAction<boolean>>;
-  shouldSwitchColumn: boolean;
-  staffList: StaffType[];
-  setStaffList: Dispatch<SetStateAction<StaffType[]>>;
-  setShouldSwitchColumn: Dispatch<SetStateAction<boolean>>;
-  columns: ColumnType[];
-  setColumns: Dispatch<SetStateAction<ColumnType[]>>;
-  cards: CardType[];
-  isModalOpen: boolean;
-  beforeUpdate: CardType | null;
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
-  cardsMap: Map<CardStatus.Status, CardType[]>;
-  servingStaffIdList: (number | null)[];
-  sensors: ReturnType<typeof useSensors>;
-  handleDragStart: (event: DragStartEvent) => void;
-  handleDragEnd: (event: DragEndEvent) => void;
-  handleConfirm: () => void;
-  handleCancel: (beforeUpdate: CardType) => void;
-}
+const reservationUsecase = container.get<IReservationUsecase>(
+  'IReservationUsecase'
+);
 
-export const useDndBoard = (): UseDndBoardReturn => {
-  const [activeCard, setActiveCard] = useState<CardType | null>(null);
+/**
+ * 今日の予約一覧を取得する
+ */
+const fetchTodayReservations = async () => {
+  return await reservationUsecase.getTodayReservations();
+};
+
+export const useDndBoard = () => {
+  const [activeCard, setActiveCard] = useState<Reservation>();
   const [isMounted, setIsMounted] = useState(false);
   const [shouldSwitchColumn, setShouldSwitchColumn] = useState(false);
   const [columns, setColumns] = useState<ColumnType[]>([]);
@@ -78,154 +74,18 @@ export const useDndBoard = (): UseDndBoardReturn => {
       order: null,
     },
   ]);
-  const [cards, setCards] = useState<CardType[]>([
-    {
-      reservationNo: 1,
-      customerId: 1,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客A',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 2,
-      customerId: 2,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客B',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 3,
-      customerId: 3,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客C',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 4,
-      customerId: 4,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客D',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 5,
-      customerId: 5,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 6,
-      customerId: 6,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 7,
-      customerId: 7,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 8,
-      customerId: 8,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 9,
-      customerId: 9,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 10,
-      customerId: 10,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 11,
-      customerId: 11,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 12,
-      customerId: 12,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 13,
-      customerId: 13,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 14,
-      customerId: 14,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 15,
-      customerId: 15,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 16,
-      customerId: 16,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 17,
-      customerId: 17,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客E',
-      menu: 'カット',
-    },
-    {
-      reservationNo: 18,
-      customerId: 18,
-      staffId: null,
-      status: 'Waiting',
-      name: '顧客Z',
-      menu: 'カット',
-    },
-  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [beforeUpdate, setBeforeUpdate] = useState<CardType | null>(null);
+  const [beforeUpdate, setBeforeUpdate] = useState<Reservation | null>(null);
+
+  const sensor = useSensor(isBrowser ? PointerSensor : TouchSensor);
+  const sensors = useSensors(sensor);
+
+  const {
+    data: reservations,
+    mutate,
+    error: reservationsError,
+    isLoading: reservationsLoading,
+  } = useSWR<Reservation[]>('reservations', fetchTodayReservations);
 
   useEffect(() => {
     const workingStaff = staffList
@@ -240,51 +100,67 @@ export const useDndBoard = (): UseDndBoardReturn => {
     );
   }, [setColumns, staffList]);
 
-  const cardsMap = useMemo(() => {
+  const reservationsMap = useMemo(() => {
+    if (!reservations) {
+      return new Map<CardStatus.Status, Reservation[]>();
+    }
     // 並び替えたカードをステータスによってMapに格納します。
-    const cardMap = cards.reduce((map, card) => {
-      const statusGroup = map.get(card.status) || [];
-      statusGroup.push(card);
-      map.set(card.status, statusGroup);
+    const cardMap = reservations.reduce((map, reservation) => {
+      const statusGroup = map.get(getCardStatus(reservation.status)) || [];
+      statusGroup.push(reservation);
+      map.set(getCardStatus(reservation.status), statusGroup);
       return map;
-    }, new Map<CardStatus.Status, CardType[]>());
+    }, new Map<CardStatus.Status, Reservation[]>());
 
     // Mapの各エントリに格納された配列を並べ替えます。
     cardMap.forEach((cardArray, status) => {
       cardMap.set(
         status,
         cardArray.sort((a, b) => {
-          if (status === CardStatus.DONE) {
-            return b.reservationNo - a.reservationNo;
+          if (status === DONE) {
+            return b.reservationId - a.reservationId;
           }
-          return a.reservationNo - b.reservationNo;
+          return a.reservationId - b.reservationId;
         })
       );
     });
-
     return cardMap;
-  }, [cards]);
+  }, [reservations]);
 
   // 接客中スタッフID一覧
   const servingStaffIdList = useMemo(() => {
-    return cards
-      .filter((card) => card.staffId !== null)
-      .map((card) => card.staffId);
-  }, [cards]);
+    if (!reservationsMap.get(IN_PROGRESS)) {
+      return [] as number[];
+    } else {
+      return reservationsMap
+        .get(IN_PROGRESS)!
+        .filter((reservation) => reservation.staffId !== null)
+        .map((reservation) => reservation.staffId);
+    }
+  }, [reservationsMap]);
 
-  const sensors = useSensors(useSensor(PointerSensor));
 
+  /**
+   * ドラッグ開始
+   * @param active
+   */
   const handleDragStart = ({ active }: DragStartEvent) => {
     const { type: activeType, id: activeId } = extractInfo(
       active.id.toString()
     );
 
     if (activeType === 'card') {
-      // @ts-ignore
-      setActiveCard(cards.find((card) => card.customerId === activeId));
+      setActiveCard(
+        reservations?.find((card) => card.reservationId === activeId)
+      );
     }
   };
 
+  /**
+   * ドラッグ終了
+   * @param active
+   * @param over
+   */
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     const { type: activeType, id: activeId } = extractInfo(
       active.id.toString()
@@ -294,8 +170,14 @@ export const useDndBoard = (): UseDndBoardReturn => {
       // For card dragging
       const { type: overType, id: overId } = extractInfo(over.id.toString());
 
-      if (overType === CardStatus.DONE && activeId) {
-        if (activeCard?.status !== CardStatus.IN_PROGRESS) {
+      // キャンセルへは手動で移動不可
+      if (overType === CANCELED && activeId) {
+        return;
+      }
+
+      // 案内済みへは案内中からのみ移動可能
+      if (overType === DONE && activeId) {
+        if (activeCard?.status !== IN_PROGRESS) {
           return;
         }
         setBeforeUpdate(activeCard);
@@ -310,8 +192,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
         CardStatus.getCardStatus(overType.toString())!,
         overId ? Number(overId) : null
       );
-      // @ts-ignore
-      setActiveCard(null);
+      setActiveCard(undefined);
     } else if (activeType === IN_PROGRESS && over) {
       // For column dragging
       const { id: overId } = extractInfo(over.id.toString());
@@ -336,7 +217,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
 
         return newColumns;
       });
-      setActiveCard(null);
+      setActiveCard(undefined);
       setShouldSwitchColumn(false);
     }
   };
@@ -345,9 +226,9 @@ export const useDndBoard = (): UseDndBoardReturn => {
     setIsModalOpen(false);
   };
 
-  const handleCancel = (beforeUpdate: CardType) => {
+  const handleCancel = (beforeUpdate: Reservation) => {
     updateCardStatus(
-      beforeUpdate.customerId,
+      beforeUpdate.reservationId,
       CardStatus.getCardStatus(beforeUpdate.status)!,
       beforeUpdate.staffId ? Number(beforeUpdate.staffId) : null
     );
@@ -355,17 +236,27 @@ export const useDndBoard = (): UseDndBoardReturn => {
   };
 
   const updateCardStatus = (
-    customerId: number | null,
+    reservationId: number | null,
     newStatus: CardStatus.Status,
     staffId: number | null = null
   ) => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.customerId === customerId
-          ? { ...card, status: newStatus, staffId: staffId }
-          : card
-      )
-    );
+    // reservationIdがnullの場合、何もしない
+    if (!reservationId) return;
+
+    // reservationsを更新
+    const updatedReservations = reservations!.map((reservation) => {
+      if (reservation.reservationId === reservationId) {
+        return {
+          ...reservation,
+          status: newStatus,
+          staffId: staffId || reservation.staffId,
+        };
+      }
+      return reservation;
+    });
+
+    // mutateを使用してデータを更新
+    mutate(updatedReservations, false).then((r) => {});
   };
 
   const extractInfo = (str: string) => {
@@ -393,8 +284,7 @@ export const useDndBoard = (): UseDndBoardReturn => {
     setStaffList,
     columns,
     setColumns,
-    cards,
-    cardsMap,
+    reservationsMap,
     servingStaffIdList,
     sensors,
     handleDragStart,

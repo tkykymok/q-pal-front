@@ -2,11 +2,9 @@ import DndBoard from '@/components/features/DndBoard/DndBoard';
 
 const Board = () => {
   return (
-    <main>
-      <div className="overflow-hidden">
-        <DndBoard/>
-      </div>
-    </main>
+    <div className="w-full overflow-hidden">
+      <DndBoard />
+    </div>
   );
 };
 

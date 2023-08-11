@@ -11,7 +11,11 @@ const MySidebar = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
   if (!isMounted) return null;
+
+  const ArrowIcon = collapsed ? IoIosArrowForward : IoIosArrowBack;
+  const justifyContent = collapsed ? 'justify-center' : 'justify-end';
 
   return (
     <Sidebar
@@ -19,21 +23,12 @@ const MySidebar = () => {
       collapsedWidth="60px"
       width="200px"
     >
-      {collapsed ? (
-        <div className="flex justify-center">
-          <IoIosArrowForward
-            className="h-6 w-6 text-neutral-500 cursor-pointer hover:scale-110"
-            onClick={() => setCollapsed(!collapsed)}
-          />
-        </div>
-      ) : (
-        <div className="flex justify-end">
-          <IoIosArrowBack
-            className="h-6 w-6 text-neutral-500 cursor-pointer hover:scale-110"
-            onClick={() => setCollapsed(!collapsed)}
-          />
-        </div>
-      )}
+      <div className={`flex ${justifyContent}`}>
+        <ArrowIcon
+          className="h-6 w-6 text-neutral-500 cursor-pointer hover:scale-110"
+          onClick={() => setCollapsed(!collapsed)}
+        />
+      </div>
 
       <Menu>
         <SubMenu label="Menu1">

@@ -24,17 +24,19 @@ const DraggableCard: FC<CardProps> = ({
   });
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`
+    <>
+      {status === CardStatus.PENDING && <Timer />}
+      <div
+        ref={setNodeRef}
+        className={`
         ${active?.id === id ? 'opacity-20' : ''}
       `}
-      {...listeners}
-      {...attributes}
-    >
-      {status === CardStatus.PENDING && <Timer />}
-      {children}
-    </div>
+        {...listeners}
+        {...attributes}
+      >
+        {children}
+      </div>
+    </>
   );
 };
 
