@@ -20,6 +20,7 @@ import { isBrowser, isTablet } from 'react-device-detect';
 import DONE = CardStatus.DONE;
 import CANCELED = CardStatus.CANCELED;
 import Status = CardStatus.Status;
+import UpdateReservation = ReservationRequest.UpdateReservation;
 
 const reservationUsecase = container.get<IReservationUsecase>(
   'IReservationUsecase'
@@ -53,7 +54,7 @@ export const useDndBoard = () => {
     {
       staffId: 3,
       name: '坂本',
-      isWorking: false,
+      isWorking: true,
       order: null,
     },
     {
@@ -140,7 +141,6 @@ export const useDndBoard = () => {
         .map((reservation) => reservation.staffId);
     }
   }, [reservationsMap]);
-
 
   /**
    * ドラッグ開始
@@ -237,13 +237,28 @@ export const useDndBoard = () => {
     setIsModalOpen(false);
   };
 
-  const updateReservationStatus = (
+  // 予約ステータス更新
+  const updateReservationStatus = async (
     reservationId: number | null,
     newStatus: Status,
-    staffId: number | null = null
+    staffId: number | null = null,
+    menuId: number | null = null
   ) => {
     // reservationIdがnullの場合、何もしない
     if (!reservationId) return;
+
+    const request: UpdateReservation = {
+      reservationId: reservationId,
+      status: newStatus,
+      staffId: staffId,
+      menuId: menuId,
+    };
+
+    try {
+      await reservationUsecase.updateReservation(request);
+    } catch (error) {
+      return;
+    }
 
     // reservationsを更新
     const updatedReservations = reservations!.map((reservation) => {

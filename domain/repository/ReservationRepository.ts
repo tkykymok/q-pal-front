@@ -6,6 +6,7 @@ import CreateReservationRes = ReservationResponse.CreateReservation;
 import { AxiosInstance } from '@/config/axios';
 import ApiResponse = CommonResponse.ApiResponse;
 import GetMyWaitingInfo = ReservationRequest.GetMyWaitingInfo;
+import UpdateReservation = ReservationRequest.UpdateReservation;
 
 export interface IReservationRepository {
   getTodayReservations(): Promise<ApiResponse<GetReservations>>;
@@ -19,6 +20,10 @@ export interface IReservationRepository {
   createReservation(
     request: CreateReservationReq
   ): Promise<ApiResponse<CreateReservationRes>>;
+
+  updateReservation(
+    request: UpdateReservation
+  ): Promise<ApiResponse<unknown>>;
 }
 
 @injectable()
@@ -54,6 +59,16 @@ export class ReservationRepository implements IReservationRepository {
   ): Promise<ApiResponse<CreateReservationRes>> {
     const response = await this.axiosInstance.instance.post(
       '/create-reservation',
+      request
+    );
+    return response.data;
+  }
+
+  async updateReservation(
+    request: UpdateReservation
+  ): Promise<ApiResponse<unknown>> {
+    const response = await this.axiosInstance.instance.put(
+      '/update-reservation',
       request
     );
     return response.data;
