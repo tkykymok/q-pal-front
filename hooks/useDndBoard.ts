@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StaffType } from '@/components/features/DndBoard/DndBoard';
 import {
   DragEndEvent,
   PointerSensor,
@@ -21,9 +20,14 @@ import DONE = CardStatus.DONE;
 import CANCELED = CardStatus.CANCELED;
 import Status = CardStatus.Status;
 import UpdateReservation = ReservationRequest.UpdateReservation;
+import {IStaffUsecase} from '@/domain/usecases/StaffUsecase';
+import {Staff} from '@/domain/types/models/Staff';
 
 const reservationUsecase = container.get<IReservationUsecase>(
   'IReservationUsecase'
+);
+const staffUsecase = container.get<IStaffUsecase>(
+  'IStaffUsecase'
 );
 
 /**
@@ -33,49 +37,19 @@ const fetchTodayReservations = async () => {
   return await reservationUsecase.getTodayReservations();
 };
 
+/**
+ * スタッフ一覧を取得する
+ */
+const fetchStaffs = async () => {
+  return await staffUsecase.getStaffs();
+};
+
+
 export const useDndBoard = () => {
   const [activeCard, setActiveCard] = useState<Reservation>();
   const [isMounted, setIsMounted] = useState(false);
   const [shouldSwitchColumn, setShouldSwitchColumn] = useState(false);
   const [columns, setColumns] = useState<ColumnType[]>([]);
-  const [staffList, setStaffList] = useState<StaffType[]>([
-    {
-      staffId: 1,
-      name: '山田',
-      isWorking: true,
-      order: 2,
-    },
-    {
-      staffId: 2,
-      name: '鈴木',
-      isWorking: true,
-      order: 1,
-    },
-    {
-      staffId: 3,
-      name: '坂本',
-      isWorking: true,
-      order: null,
-    },
-    {
-      staffId: 4,
-      name: '田中',
-      isWorking: true,
-      order: 3,
-    },
-    {
-      staffId: 5,
-      name: '小島',
-      isWorking: false,
-      order: null,
-    },
-    {
-      staffId: 6,
-      name: '後藤',
-      isWorking: false,
-      order: null,
-    },
-  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [beforeUpdate, setBeforeUpdate] = useState<Reservation | null>(null);
 
@@ -84,23 +58,32 @@ export const useDndBoard = () => {
 
   const {
     data: reservations,
-    mutate,
+    mutate: reservationsMutate,
     error: reservationsError,
     isLoading: reservationsLoading,
   } = useSWR<Reservation[]>('reservations', fetchTodayReservations);
 
+  const {
+    data: staffs,
+    mutate: staffsMutate,
+    error: staffsError,
+    isLoading: staffsLoading,
+  } = useSWR<Staff[]>('staffs', fetchStaffs);
+
   useEffect(() => {
-    const workingStaff = staffList
-      .filter((staff) => staff.isWorking)
-      .sort((a, b) => (a.order || 0) - (b.order || 0));
-    setColumns(
-      workingStaff.map((staff) => ({
-        staffId: staff.staffId,
-        status: CardStatus.IN_PROGRESS,
-        title: staff.name,
-      }))
-    );
-  }, [setColumns, staffList]);
+    if (staffs) {
+      const workingStaff = staffs
+        .filter((staff) => staff.activeFlag)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+      setColumns(
+        workingStaff.map((staff) => ({
+          staffId: staff.staffId,
+          status: CardStatus.IN_PROGRESS,
+          title: staff.name,
+        }))
+      );
+    }
+  }, [setColumns, staffs]);
 
   // ステータス毎予約一覧
   const reservationsMap = useMemo(() => {
@@ -203,8 +186,8 @@ export const useDndBoard = () => {
 
       setColumns((columns) => {
         const newColumns = arrayMove(columns, oldIndex, newIndex);
-        // Update the 'order' field of each staff in the staffList
-        const newStaffList = staffList.map((staff) => {
+        // Update the 'order' field of each staff in the staffs
+        const newStaffList = staffs?.map((staff) => {
           const newOrder = newColumns.findIndex(
             (column) => column.staffId === staff.staffId
           );
@@ -215,7 +198,7 @@ export const useDndBoard = () => {
           // If the staff is not found in the columns (not working), keep its original data
           return staff;
         });
-        setStaffList(newStaffList);
+        staffsMutate(newStaffList, false).then((r) => {});
 
         return newColumns;
       });
@@ -238,7 +221,7 @@ export const useDndBoard = () => {
   };
 
   // 予約ステータス更新
-  const updateReservationStatus = async (
+  const updateReservationStatus = (
     reservationId: number | null,
     newStatus: Status,
     staffId: number | null = null,
@@ -254,26 +237,22 @@ export const useDndBoard = () => {
       menuId: menuId,
     };
 
-    try {
-      await reservationUsecase.updateReservation(request);
-    } catch (error) {
-      return;
-    }
+    reservationUsecase.updateReservation(request).then(() => {
+      // reservationsを更新
+      const updatedReservations = reservations!.map((reservation) => {
+        if (reservation.reservationId === reservationId) {
+          return {
+            ...reservation,
+            status: newStatus,
+            staffId: staffId || reservation.staffId,
+          };
+        }
+        return reservation;
+      });
 
-    // reservationsを更新
-    const updatedReservations = reservations!.map((reservation) => {
-      if (reservation.reservationId === reservationId) {
-        return {
-          ...reservation,
-          status: newStatus,
-          staffId: staffId || reservation.staffId,
-        };
-      }
-      return reservation;
+      // mutateを使用してデータを更新
+      reservationsMutate(updatedReservations, false).then((r) => {});
     });
-
-    // mutateを使用してデータを更新
-    mutate(updatedReservations, false).then((r) => {});
   };
 
   const extractInfo = (str: string) => {
@@ -297,8 +276,8 @@ export const useDndBoard = () => {
     isModalOpen,
     beforeUpdate,
     setIsModalOpen,
-    staffList,
-    setStaffList,
+    staffs,
+    staffsMutate,
     columns,
     setColumns,
     reservationsMap,

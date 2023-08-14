@@ -20,13 +20,6 @@ import Modal from '@/components/Modal';
 import { CardStatus } from '@/constant/CardStatus';
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 
-export interface StaffType {
-  staffId: number;
-  name: string;
-  isWorking: boolean;
-  order?: number | null;
-}
-
 const DndBoard = () => {
   const {
     activeCard,
@@ -37,8 +30,8 @@ const DndBoard = () => {
     isModalOpen,
     beforeUpdate,
     setIsModalOpen,
-    staffList,
-    setStaffList,
+    staffs,
+    staffsMutate,
     columns,
     reservationsMap,
     servingStaffIdList,
@@ -189,8 +182,8 @@ const DndBoard = () => {
           {/* スタッフ一覧 */}
           <div className="flex">
             <StaffListArea
-              staffList={staffList}
-              setStaffList={setStaffList}
+              staffList={staffs}
+              staffsMutate={staffsMutate}
               servingStaffIdList={servingStaffIdList}
             />
           </div>
