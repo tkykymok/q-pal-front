@@ -26,13 +26,13 @@ export class ReservationRepository implements IReservationRepository {
   constructor(@inject('IAxiosInstance') private axiosInstance: AxiosInstance) {}
 
   async getTodayReservations(): Promise<ApiResponse<GetReservations>> {
-    const response = await this.axiosInstance.instance.get('/reservations');
+    const response = await this.axiosInstance.instance.get('/reservations/today');
     return response.data;
   }
 
   async getLineEndWaitingInfo(): Promise<ApiResponse<GetWaitingInfo>> {
     const response = await this.axiosInstance.instance.get(
-      '/lineEndWaitTime'
+      '/reservations/line-end-wait-time'
     );
     return response.data;
   }
@@ -41,7 +41,7 @@ export class ReservationRepository implements IReservationRepository {
     request: GetMyWaitingInfo
   ): Promise<ApiResponse<GetWaitingInfo>> {
     const response = await this.axiosInstance.instance.get(
-      '/myWaitTime',
+      '/reservations/my-wait-time',
       {
         params: request,
       }
@@ -53,7 +53,7 @@ export class ReservationRepository implements IReservationRepository {
     request: CreateReservationReq
   ): Promise<ApiResponse<CreateReservationRes>> {
     const response = await this.axiosInstance.instance.post(
-      '/reservation',
+      '/create-reservation',
       request
     );
     return response.data;

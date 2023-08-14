@@ -19,6 +19,7 @@ import getCardStatus = CardStatus.getCardStatus;
 import { isBrowser, isTablet } from 'react-device-detect';
 import DONE = CardStatus.DONE;
 import CANCELED = CardStatus.CANCELED;
+import Status = CardStatus.Status;
 
 const reservationUsecase = container.get<IReservationUsecase>(
   'IReservationUsecase'
@@ -100,6 +101,7 @@ export const useDndBoard = () => {
     );
   }, [setColumns, staffList]);
 
+  // ステータス毎予約一覧
   const reservationsMap = useMemo(() => {
     if (!reservations) {
       return new Map<CardStatus.Status, Reservation[]>();
@@ -187,7 +189,7 @@ export const useDndBoard = () => {
         }, 300);
       }
 
-      updateCardStatus(
+      updateReservationStatus(
         activeId,
         CardStatus.getCardStatus(overType.toString())!,
         overId ? Number(overId) : null
@@ -227,17 +229,17 @@ export const useDndBoard = () => {
   };
 
   const handleCancel = (beforeUpdate: Reservation) => {
-    updateCardStatus(
+    updateReservationStatus(
       beforeUpdate.reservationId,
-      CardStatus.getCardStatus(beforeUpdate.status)!,
+      beforeUpdate.status!,
       beforeUpdate.staffId ? Number(beforeUpdate.staffId) : null
     );
     setIsModalOpen(false);
   };
 
-  const updateCardStatus = (
+  const updateReservationStatus = (
     reservationId: number | null,
-    newStatus: CardStatus.Status,
+    newStatus: Status,
     staffId: number | null = null
   ) => {
     // reservationIdがnullの場合、何もしない
