@@ -109,7 +109,7 @@ const DroppableColumn: FC<ColumnProps> = ({
           flex 
           justify-between
           ${status === WAITING && 'bg-blue-400'}
-          ${status === PENDING && 'bg-gray-400'}
+          ${status === PENDING && 'bg-neutral-300'}
           ${status === IN_PROGRESS && 'bg-green-400'}
           ${status === DONE && 'bg-gray-400'}
           ${status === CANCELED && 'bg-red-400'}

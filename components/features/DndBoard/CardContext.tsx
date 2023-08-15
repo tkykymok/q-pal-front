@@ -28,7 +28,7 @@ const CardContext: FC<CardContextProps> = ({
         ${forOverlay && 'bg-orange-200'}
         ${!isDraggable && !forOverlay ? 'opacity-60' : ''}
         ${reservation.status === WAITING && 'bg-blue-200'}
-        ${reservation.status === PENDING && 'bg-gray-200'}
+        ${reservation.status === PENDING && 'bg-neutral-200'}
         ${reservation.status === IN_PROGRESS && 'bg-green-200'}
         ${reservation.status === DONE && 'bg-gray-200'}
       `}
