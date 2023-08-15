@@ -5,12 +5,12 @@ import { useDroppable } from '@dnd-kit/core';
 import DraggableCard from '@/components/features/DndBoard/DraggableCard';
 import CardContext from '@/components/features/DndBoard/CardContext';
 import { CardStatus } from '@/constant/CardStatus';
-import Status = CardStatus.Status;
 import { Reservation } from '@/domain/types/models/Reservation';
-import WAITING = CardStatus.WAITING;
+import Status = CardStatus.Status;
 import PENDING = CardStatus.PENDING;
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
+import WAITING = CardStatus.WAITING;
 import CANCELED = CardStatus.CANCELED;
 
 interface ColumnProps {
@@ -103,9 +103,22 @@ const DroppableColumn: FC<ColumnProps> = ({
   // Header
   const HeaderContent = () => (
     <div className="sticky top-0 bg-white z-10">
-      <div className={`p-5 flex justify-between ${isOver ? 'bg-amber-100' : ''}`} onClick={onClickHeader}>
+      <div
+        className={`
+          p-5 
+          flex 
+          justify-between
+          ${status === WAITING && 'bg-blue-400'}
+          ${status === PENDING && 'bg-gray-400'}
+          ${status === IN_PROGRESS && 'bg-green-400'}
+          ${status === DONE && 'bg-gray-400'}
+          ${status === CANCELED && 'bg-red-400'}
+          ${isOver ? 'bg-amber-100' : ''}
+        `}
+        onClick={onClickHeader}
+      >
         <div className="flex">
-          <div>{title}</div>
+          <div className="text-neutral-700 font-bold">{title}</div>
           {collapsibleStatuses.includes(status) && (
             <span className="transition group-open:rotate-180 cursor-pointer">
               <svg

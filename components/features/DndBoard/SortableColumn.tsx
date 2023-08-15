@@ -1,9 +1,9 @@
 'use client';
 
-import React, { FC, ReactNode } from 'react';
+import React, { FC } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {CardStatus} from '@/constant/CardStatus';
+import { CardStatus } from '@/constant/CardStatus';
 
 interface SortableColumnProps {
   status: CardStatus.Status;
@@ -29,20 +29,26 @@ const SortableColumn: FC<SortableColumnProps> = ({
       {...attributes}
       {...listeners}
       style={style}
-      className="
-        m-3
-        px-5
-        py-2
+      className={`
+        mx-3
         rounded-md
         bg-white
         shadow-xl
-        border-2
-        border-green-400
-      "
+        border-4
+        border-yellow-400
+      `}
     >
-      <h2 className="p-3">
-        {title}
-      </h2>
+      <div
+        className={`
+          p-5 
+          flex 
+          bg-green-400
+        `}
+      >
+        <div className="flex">
+          <div className="text-neutral-700 font-bold">{title}</div>
+        </div>
+      </div>
       <hr />
       <div className="min-h-20 py-2" />
     </div>
