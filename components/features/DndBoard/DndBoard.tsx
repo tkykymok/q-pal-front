@@ -177,13 +177,10 @@ const DndBoard = () => {
             </div>
           </div>
 
-
-
           {/* スタッフ一覧 */}
           <div className="flex">
             <StaffListArea
               staffList={staffs}
-              staffsMutate={staffsMutate}
               servingStaffIdList={servingStaffIdList}
             />
           </div>

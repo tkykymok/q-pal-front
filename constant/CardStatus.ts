@@ -38,9 +38,9 @@ export namespace CardStatus {
     [CANCELED, { status: CANCELED, title: 'キャンセル' }],
   ]);
 
-  export const getCardStatus = (str: string): Status => {
-    return statusMapping.get(str as Status)?.status as Status;
-  };
+  // export const getCardStatus = (str: string): Status => {
+  //   return statusMapping.get(str as Status)?.status as Status;
+  // };
 
   export const getCardStatusTitle = (status: Status): string => {
     return statusMapping.get(status)?.title ?? '';

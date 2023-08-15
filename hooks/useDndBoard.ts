@@ -6,29 +6,28 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import useSWR, { mutate } from 'swr';
+import container from '@/config/di';
 import { DragStartEvent } from '@dnd-kit/core/dist/types/events';
 import { arrayMove } from '@dnd-kit/sortable';
 import { CardStatus, ColumnType } from '@/constant/CardStatus';
-import IN_PROGRESS = CardStatus.IN_PROGRESS;
-import container from '@/config/di';
 import { IReservationUsecase } from '@/domain/usecases/ReservationUsecase';
 import { Reservation } from '@/domain/types/models/Reservation';
-import useSWR from 'swr';
-import getCardStatus = CardStatus.getCardStatus;
-import { isBrowser, isTablet } from 'react-device-detect';
+import { isBrowser } from 'react-device-detect';
+import { IStaffUsecase } from '@/domain/usecases/StaffUsecase';
+import { Staff } from '@/domain/types/models/Staff';
+import Status = CardStatus.Status;
+import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
 import CANCELED = CardStatus.CANCELED;
-import Status = CardStatus.Status;
 import UpdateReservation = ReservationRequest.UpdateReservation;
-import {IStaffUsecase} from '@/domain/usecases/StaffUsecase';
-import {Staff} from '@/domain/types/models/Staff';
+import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
+import UpdateActiveStaffsData = StaffRequest.UpdateActiveStaffsData;
 
 const reservationUsecase = container.get<IReservationUsecase>(
   'IReservationUsecase'
 );
-const staffUsecase = container.get<IStaffUsecase>(
-  'IStaffUsecase'
-);
+const staffUsecase = container.get<IStaffUsecase>('IStaffUsecase');
 
 /**
  * 今日の予約一覧を取得する
@@ -43,7 +42,6 @@ const fetchTodayReservations = async () => {
 const fetchStaffs = async () => {
   return await staffUsecase.getStaffs();
 };
-
 
 export const useDndBoard = () => {
   const [activeCard, setActiveCard] = useState<Reservation>();
@@ -92,9 +90,9 @@ export const useDndBoard = () => {
     }
     // 並び替えたカードをステータスによってMapに格納します。
     const cardMap = reservations.reduce((map, reservation) => {
-      const statusGroup = map.get(getCardStatus(reservation.status)) || [];
+      const statusGroup = map.get(reservation.status) || [];
       statusGroup.push(reservation);
-      map.set(getCardStatus(reservation.status), statusGroup);
+      map.set(reservation.status, statusGroup);
       return map;
     }, new Map<CardStatus.Status, Reservation[]>());
 
@@ -174,7 +172,7 @@ export const useDndBoard = () => {
 
       updateReservationStatus(
         activeId,
-        CardStatus.getCardStatus(overType.toString())!,
+        overType.toString() as Status,
         overId ? Number(overId) : null
       );
       setActiveCard(undefined);
@@ -183,25 +181,36 @@ export const useDndBoard = () => {
       const { id: overId } = extractInfo(over.id.toString());
       const oldIndex = columns.findIndex((col) => col.staffId === activeId);
       const newIndex = columns.findIndex((col) => col.staffId === overId);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
 
-      setColumns((columns) => {
-        const newColumns = arrayMove(columns, oldIndex, newIndex);
-        // Update the 'order' field of each staff in the staffs
-        const newStaffList = staffs?.map((staff) => {
+      const newActiveStaffList = staffs!
+        .filter((staff) => staff.activeFlag) // activeスタッフに絞り込む
+        .map((staff) => {
           const newOrder = newColumns.findIndex(
             (column) => column.staffId === staff.staffId
           );
-          // If the staff is found in the columns, update its order
           if (newOrder !== -1) {
             return { ...staff, order: newOrder + 1 };
           }
-          // If the staff is not found in the columns (not working), keep its original data
           return staff;
         });
-        staffsMutate(newStaffList, false).then((r) => {});
 
-        return newColumns;
+      // activeスタッフの並び順を更新する
+      const request: UpdateActiveStaffs = {
+        data: [],
+      };
+      newActiveStaffList.forEach((staff) => {
+        const tempData: UpdateActiveStaffsData = {
+          staffId: staff.staffId,
+          order: staff.order!,
+        };
+        request.data.push(tempData);
       });
+
+      staffUsecase
+        .updateActiveStaffs(request)
+        .then(() => mutate('staffs').then());
+
       setActiveCard(undefined);
       setShouldSwitchColumn(false);
     }

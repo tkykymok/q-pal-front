@@ -5,7 +5,6 @@ import { Reservation, WaitingInfo } from '@/domain/types/models/Reservation';
 import { useEffect, useMemo, useState } from 'react';
 import { CardStatus } from '@/constant/CardStatus';
 import useAppStore from '@/store/AppStore';
-import getCardStatus = CardStatus.getCardStatus;
 import GetMyWaitingInfo = ReservationRequest.GetMyWaitingInfo;
 import { useSearchParams } from 'next/navigation';
 
@@ -24,7 +23,6 @@ const fetchTodayReservations = async () => {
  * 最後尾の待ち時間を取得する
  */
 const fetchMyWaitingInfo = async (encryptedText: string) => {
-  console.log(encryptedText);
   const request: GetMyWaitingInfo = {
     encryptedText: encodeURIComponent(encryptedText),
   };
@@ -69,9 +67,9 @@ export const useMyReservation = () => {
   const reservationsMap = useMemo(() => {
     // 予約一覧をステータス毎にMapに格納します。
     return reservations?.reduce((map, reservation) => {
-      const statusGroup = map.get(getCardStatus(reservation.status)!) || [];
+      const statusGroup = map.get(reservation.status) || [];
       statusGroup.push(reservation);
-      map.set(getCardStatus(reservation.status)!, statusGroup);
+      map.set(reservation.status, statusGroup);
       return map;
     }, new Map<CardStatus.Status, Reservation[]>());
   }, [reservations]);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { AiOutlineClose, AiOutlineSearch } from 'react-icons/ai';
 import Image from 'next/image';
 import { Switch } from '@headlessui/react';
@@ -8,50 +8,56 @@ import { Sidebar } from 'react-pro-sidebar';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import Modal from '@/components/Modal';
 import { Staff } from '@/domain/types/models/Staff';
-import { KeyedMutator } from 'swr';
+import { mutate } from 'swr';
+import { useForm } from 'react-hook-form';
+import container from '@/config/di';
+import { IStaffUsecase } from '@/domain/usecases/StaffUsecase';
+import CreateActiveStaff = StaffRequest.CreateActiveStaff;
+import RemoveActiveStaff = StaffRequest.RemoveActiveStaff;
+
+const staffUsecase = container.get<IStaffUsecase>('IStaffUsecase');
 
 interface StaffListAreaProps {
   staffList?: Staff[];
-  staffsMutate: KeyedMutator<Staff[]>;
   servingStaffIdList: (number | null)[];
 }
 
+type Inputs = {
+  searchName: string;
+};
+
 const StaffListArea: FC<StaffListAreaProps> = ({
   staffList,
-  staffsMutate,
   servingStaffIdList = [],
 }) => {
-  const [searchName, setSearchName] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
   const [collapsed, setCollapsed] = useState(true);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  useEffect(() => {}, [collapsed]);
+  const { register, watch, reset } = useForm<Inputs>({
+    defaultValues: {
+      searchName: '',
+    },
+  });
 
-  const toggleWorkingStatus = (staffId: number) => {
-    const workingStaffCount = staffList!.filter(
-      (staff) => staff.activeFlag
-    ).length;
+  const toggleActiveFlag = (activeFlag: boolean, staffId: number) => {
+    // トグルボタンONの場合
+    if (activeFlag) {
+      const request: CreateActiveStaff = {
+        staffId: staffId,
+      };
 
-    const newStaffList = staffList!.map((staff) => {
-      if (staff.staffId === staffId) {
-        return {
-          ...staff,
-          activeFlag: !staff.activeFlag,
-          order: !staff.activeFlag ? workingStaffCount + 1 : null,
-        };
-      }
-      return staff;
-    });
+      staffUsecase
+        .createActiveStaff(request)
+        .then(() => mutate('staffs').then());
+    } else {
+      // トグルボタンOFFの場合
+      const request: RemoveActiveStaff = {
+        staffId: staffId,
+      };
 
-    staffsMutate(newStaffList, false).then((r) => {});
-
-  };
-
-  const clearSearch = () => {
-    setSearchName('');
-    if (inputRef.current) {
-      inputRef.current.value = '';
+      staffUsecase
+        .removeActiveStaff(request)
+        .then(() => mutate('staffs').then());
     }
   };
 
@@ -87,16 +93,14 @@ const StaffListArea: FC<StaffListAreaProps> = ({
           <form className="flex items-center justify-between bg-white rounded-md p-2 m-3 shadow-lg flex-1 relative">
             <AiOutlineSearch className="h-6 w-6 text-gray-400" />
             <input
-              ref={inputRef}
+              {...register('searchName')}
               type="text"
               className="flex-1 mx-1 outline-none"
               placeholder="Search"
-              onInput={(event) =>
-                setSearchName((event.target as HTMLInputElement).value)
-              }
             />
+
             <AiOutlineClose
-              onClick={clearSearch}
+              onClick={() => reset()}
               className="h-3 w-3 text-gray-400 cursor-pointer hover:text-gray-500 absolute right-2"
             />
             <button type="submit" hidden>
@@ -110,9 +114,11 @@ const StaffListArea: FC<StaffListAreaProps> = ({
         staffList
           .filter((staff) => {
             if (collapsed) {
-              return staff.name.includes(searchName) && staff.activeFlag;
+              return (
+                staff.name.includes(watch('searchName')) && staff.activeFlag
+              );
             }
-            return staff.name.includes(searchName);
+            return staff.name.includes(watch('searchName'));
           })
           .map((staff) => (
             <div key={staff.staffId} className="p-3 flex">
@@ -136,7 +142,9 @@ const StaffListArea: FC<StaffListAreaProps> = ({
                   <div>
                     <Switch
                       checked={staff.activeFlag}
-                      onChange={() => toggleWorkingStatus(staff.staffId)}
+                      onChange={(activeFlag) =>
+                        toggleActiveFlag(activeFlag, staff.staffId)
+                      }
                       disabled={isServing(staff.staffId)}
                       className={`${
                         !staff.activeFlag
