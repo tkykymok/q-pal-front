@@ -1,6 +1,5 @@
 import React, { FC, ReactNode } from 'react';
 import './globals.css';
-import MySidebar from '@/components/MySidebar';
 
 export const metadata = {
   title: 'QPal',

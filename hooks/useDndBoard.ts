@@ -19,7 +19,6 @@ import { Staff } from '@/domain/types/models/Staff';
 import Status = CardStatus.Status;
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
-import CANCELED = CardStatus.CANCELED;
 import UpdateReservation = ReservationRequest.UpdateReservation;
 import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
 import UpdateActiveStaffsData = StaffRequest.UpdateActiveStaffsData;
