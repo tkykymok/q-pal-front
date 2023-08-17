@@ -9,6 +9,7 @@ import PENDING = CardStatus.PENDING;
 import DONE = CardStatus.DONE;
 import Status = CardStatus.Status;
 import CANCELED = CardStatus.CANCELED;
+import { BsPersonCheckFill } from 'react-icons/bs';
 
 interface CardContextProps {
   reservation: Reservation;
@@ -21,8 +22,6 @@ const CardContext: FC<CardContextProps> = ({
   isDraggable,
   forOverlay = false,
 }) => {
-
-
   const getBackgroundColor = (status: Status, forOverlay: boolean) => {
     if (forOverlay) return 'bg-drag-child';
     switch (status) {
@@ -52,7 +51,14 @@ const CardContext: FC<CardContextProps> = ({
     >
       <div className="text-neutral-800 p-3">
         <div className="flex justify-between">
-          <div>#{reservation.reservationNumber}</div>
+          <div className="flex items-center">
+            #{reservation.reservationNumber}
+            {reservation.arrivalFlag && reservation.status === WAITING && (
+              <div className="ml-2">
+                <BsPersonCheckFill color="green" size={20} />
+              </div>
+            )}
+          </div>
           <div>{reservation.customerName}</div>
         </div>
         {(reservation.status === WAITING ||
