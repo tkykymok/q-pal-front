@@ -25,9 +25,6 @@ export const useReservation = () => {
   };
   const {
     data: reservations,
-    mutate: reservationsMutate,
-    error: reservationsError,
-    isLoading: reservationsLoading,
   } = useSWR<Reservation[]>(
     reservationUsecase ? 'reservations' : null,
     fetchTodayReservations
@@ -85,24 +82,6 @@ export const useReservation = () => {
       await reservationUsecase!.updateReservation(request);
       // 予約一覧を再検索する
       await mutate('reservations');
-
-      // const updatedReservations: Reservation[] = reservations!.map(
-      //   (reservation) => {
-      //     if (reservation.reservationId === data.reservationId) {
-      //       return {
-      //         ...reservation,
-      //         status: data.status,
-      //         staffId: data.staffId,
-      //         holdStartDatetime: data.holdStartDatetime,
-      //         serviceStartDatetime: data.serviceStartDatetime,
-      //         serviceEndDatetime: data.serviceEndDatetime,
-      //       } as Reservation;
-      //     }
-      //     return reservation;
-      //   }
-      // );
-      // // mutateを使用してデータを更新
-      // await reservationsMutate(updatedReservations, false);
     } catch (error) {
       // エラーの場合予約一覧を再検索する
       await mutate('reservations');

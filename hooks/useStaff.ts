@@ -27,9 +27,6 @@ export const useStaff = (reservationsMap: Map<Status, Reservation[]>) => {
 
   const {
     data: staffs,
-    mutate: staffsMutate,
-    error: staffsError,
-    isLoading: staffsLoading,
   } = useSWR<Staff[]>(staffUsecase ? 'staffs' : null, fetchStaffs);
 
   // 接客中スタッフID一覧

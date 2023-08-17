@@ -5,13 +5,10 @@ import { useDraggable } from '@dnd-kit/core';
 import Timer from '@/components/Timer';
 import { CardStatus } from '@/constant/CardStatus';
 import { Reservation } from '@/domain/types/models/Reservation';
+import { useReservation } from '@/hooks/useReservation';
 import PENDING = CardStatus.PENDING;
-import container from '@/config/di';
-import {IReservationUsecase} from '@/domain/usecases/ReservationUsecase';
-
-const reservationUsecase = container.get<IReservationUsecase>(
-  'IReservationUsecase'
-);
+import CANCELED = CardStatus.CANCELED;
+import {mutate} from 'swr';
 
 interface CardProps {
   reservation?: Reservation;
@@ -30,16 +27,22 @@ const DraggableCard: FC<CardProps> = ({
     id,
     disabled: !isDraggable,
   });
+  
+  const { updateReservationStatus } = useReservation();
 
-  const handleOnTimesUp = () => {
-
+  /**
+   * 保留時間切れ時に自動キャンセル
+   */
+  const handleOnTimesUp = async () => {
+    if (!reservation) return;
+    await updateReservationStatus(reservation.reservationId, CANCELED, reservation.status)
+    await mutate('reservations');
   }
-
 
   return (
     <>
       {reservation?.status === PENDING && (
-        <Timer holdStartDatetime={reservation.holdStartDatetime} onTimesUp={() => {}} />
+        <Timer holdStartDatetime={reservation.holdStartDatetime} onTimesUp={handleOnTimesUp} />
       )}
       <div
         ref={setNodeRef}
