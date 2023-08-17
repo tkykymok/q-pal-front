@@ -6,6 +6,12 @@ import Timer from '@/components/Timer';
 import { CardStatus } from '@/constant/CardStatus';
 import { Reservation } from '@/domain/types/models/Reservation';
 import PENDING = CardStatus.PENDING;
+import container from '@/config/di';
+import {IReservationUsecase} from '@/domain/usecases/ReservationUsecase';
+
+const reservationUsecase = container.get<IReservationUsecase>(
+  'IReservationUsecase'
+);
 
 interface CardProps {
   reservation?: Reservation;
@@ -25,10 +31,15 @@ const DraggableCard: FC<CardProps> = ({
     disabled: !isDraggable,
   });
 
+  const handleOnTimesUp = () => {
+
+  }
+
+
   return (
     <>
       {reservation?.status === PENDING && (
-        <Timer holdStartDatetime={reservation.holdStartDatetime} />
+        <Timer holdStartDatetime={reservation.holdStartDatetime} onTimesUp={() => {}} />
       )}
       <div
         ref={setNodeRef}

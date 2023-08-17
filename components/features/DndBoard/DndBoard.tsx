@@ -31,7 +31,6 @@ const DndBoard = () => {
     beforeUpdate,
     setIsModalOpen,
     staffs,
-    staffsMutate,
     columns,
     reservationsMap,
     servingStaffIdList,
