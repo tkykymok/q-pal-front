@@ -1,6 +1,5 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
-import BaseResponse = CommonResponse.BaseResponse;
 import AddTodo = TodoRequest.AddTodo;
 import GetAllTodo = TodoResponse.GetAllTodo;
 import { AxiosInstance } from '@/config/axios';
@@ -8,7 +7,7 @@ import { AxiosInstance } from '@/config/axios';
 export interface ITodoDataSource {
   getAllTodos(): Promise<GetAllTodo>;
 
-  addTodo(todo: AddTodo): Promise<BaseResponse>;
+  addTodo(todo: AddTodo): Promise<unknown>;
 }
 
 @injectable()
@@ -20,7 +19,7 @@ export class TodoDataSource implements ITodoDataSource {
     return response.data;
   }
 
-  async addTodo(todo: AddTodo): Promise<BaseResponse> {
+  async addTodo(todo: AddTodo): Promise<unknown> {
     const response = await this.axiosInstance.instance.post('/todo', todo);
     return response.data;
   }

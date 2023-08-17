@@ -1,14 +1,13 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 import type { ITodoDataSource } from '@/domain/datasource/TodoDataSource';
-import BaseResponse = CommonResponse.BaseResponse;
 import AddTodo = TodoRequest.AddTodo;
 import GetAllTodo = TodoResponse.GetAllTodo;
 
 export interface ITodoRepository {
   getAllTodos(): Promise<GetAllTodo>;
 
-  addTodo(todo: AddTodo): Promise<BaseResponse>;
+  addTodo(todo: AddTodo): Promise<unknown>;
 }
 
 @injectable()
@@ -19,7 +18,7 @@ export class TodoRepository implements ITodoRepository {
     return this.datasource.getAllTodos();
   }
 
-  async addTodo(todo: AddTodo): Promise<BaseResponse> {
+  async addTodo(todo: AddTodo): Promise<unknown> {
     return this.datasource.addTodo(todo);
   }
 }
