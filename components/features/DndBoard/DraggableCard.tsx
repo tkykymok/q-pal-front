@@ -35,6 +35,7 @@ const DraggableCard: FC<CardProps> = ({
    */
   const handleOnTimesUp = async () => {
     if (!reservation) return;
+    if (reservation.arrivalFlag) return; // 到着フラグがONの場合は何もしない
     await updateReservationStatus(reservation.reservationId, CANCELED, reservation.status)
     await mutate('reservations');
   }
