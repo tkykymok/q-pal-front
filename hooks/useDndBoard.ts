@@ -51,7 +51,14 @@ export const useDndBoard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [beforeUpdate, setBeforeUpdate] = useState<Reservation | null>(null);
 
-  const sensor = useSensor(isBrowser ? PointerSensor : TouchSensor);
+  const activationOptions = {
+    activationConstraint: {
+      delay: isBrowser ? 0 : 100,
+      tolerance: 0
+    }
+  };
+
+  const sensor = useSensor(isBrowser ? PointerSensor : TouchSensor, activationOptions);
   const sensors = useSensors(sensor);
 
   const {
@@ -144,7 +151,7 @@ export const useDndBoard = () => {
    * @param active
    * @param over
    */
-  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+  const handleDragEnd = async ({ active, over }: DragEndEvent) => {
     const { type: activeType, id: activeId } = extractInfo(
       active.id.toString()
     );
@@ -153,10 +160,10 @@ export const useDndBoard = () => {
       // For card dragging
       const { type: overType, id: overId } = extractInfo(over.id.toString());
 
-      // キャンセルへは手動で移動不可
-      if (overType === CANCELED && activeId) {
-        return;
-      }
+      // // キャンセルへは手動で移動不可
+      // if (overType === CANCELED && activeId) {
+      //   return;
+      // }
 
       // 案内済みへは案内中からのみ移動可能
       if (overType === DONE && activeId) {
@@ -170,9 +177,10 @@ export const useDndBoard = () => {
         }, 300);
       }
 
-      updateReservationStatus(
+      await updateReservationStatus(
         activeId,
         overType.toString() as Status,
+        activeCard!.status,
         overId ? Number(overId) : null
       );
       setActiveCard(undefined);
@@ -220,24 +228,28 @@ export const useDndBoard = () => {
     setIsModalOpen(false);
   };
 
-  const handleCancel = (beforeUpdate: Reservation) => {
-    updateReservationStatus(
+  const handleCancel = async (beforeUpdate: Reservation) => {
+    await updateReservationStatus(
       beforeUpdate.reservationId,
       beforeUpdate.status!,
+      null,
       beforeUpdate.staffId ? Number(beforeUpdate.staffId) : null
     );
     setIsModalOpen(false);
   };
 
   // 予約ステータス更新
-  const updateReservationStatus = (
+  const updateReservationStatus = async (
     reservationId: number | null,
     newStatus: Status,
+    oldStatus: Status | null,
     staffId: number | null = null,
     menuId: number | null = null
   ) => {
     // reservationIdがnullの場合、何もしない
     if (!reservationId) return;
+    // ステータスに変更がないかつスタッフIDが指定されてない場合、何もしない
+    if (newStatus === oldStatus && !staffId) return;
 
     const request: UpdateReservation = {
       reservationId: reservationId,
@@ -246,22 +258,27 @@ export const useDndBoard = () => {
       menuId: menuId,
     };
 
-    reservationUsecase.updateReservation(request).then(() => {
-      // reservationsを更新
-      const updatedReservations = reservations!.map((reservation) => {
-        if (reservation.reservationId === reservationId) {
+    try {
+      const data = await reservationUsecase.updateReservation(request)
+      const updatedReservations: Reservation[] = reservations!.map((reservation) => {
+        if (reservation.reservationId === data.reservationId) {
           return {
             ...reservation,
-            status: newStatus,
-            staffId: staffId || reservation.staffId,
-          };
+            status: data.status,
+            staffId: data.staffId,
+            holdStartDatetime: data.holdStartDatetime,
+            serviceStartDatetime: data.serviceStartDatetime,
+            serviceEndDatetime: data.serviceEndDatetime
+          } as Reservation;
         }
         return reservation;
       });
-
       // mutateを使用してデータを更新
-      reservationsMutate(updatedReservations, false).then((r) => {});
-    });
+      await reservationsMutate(updatedReservations, false);
+    } catch (error) {
+      // エラーの場合予約一覧を再検索する
+      await mutate('reservations');
+    }
   };
 
   const extractInfo = (str: string) => {

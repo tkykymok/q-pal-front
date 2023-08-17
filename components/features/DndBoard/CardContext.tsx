@@ -7,6 +7,8 @@ import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import WAITING = CardStatus.WAITING;
 import PENDING = CardStatus.PENDING;
 import DONE = CardStatus.DONE;
+import Status = CardStatus.Status;
+import CANCELED = CardStatus.CANCELED;
 
 interface CardContextProps {
   reservation: Reservation;
@@ -19,20 +21,34 @@ const CardContext: FC<CardContextProps> = ({
   isDraggable,
   forOverlay = false,
 }) => {
+
+
+  const getBackgroundColor = (status: Status, forOverlay: boolean) => {
+    if (forOverlay) return 'bg-drag-child';
+    switch (status) {
+      case WAITING:
+        return 'bg-waiting-child';
+      case PENDING:
+        return 'bg-pending-child';
+      case IN_PROGRESS:
+        return 'bg-in-progress-child';
+      case DONE:
+        return 'bg-done-child';
+      case CANCELED:
+        return 'bg-cancelled-child';
+      default:
+        return '';
+    }
+  };
+
+  const opacityClass = !isDraggable && !forOverlay ? 'opacity-60' : '';
+  const backgroundColor = getBackgroundColor(reservation.status, forOverlay);
+  const rotationStyle = forOverlay ? { transform: 'rotate(3deg)' } : {};
+
   return (
     <div
-      className={`
-        p-1
-        rounded-md
-        shadow-xl
-        ${forOverlay && 'bg-orange-200'}
-        ${!isDraggable && !forOverlay ? 'opacity-60' : ''}
-        ${reservation.status === WAITING && 'bg-blue-200'}
-        ${reservation.status === PENDING && 'bg-neutral-200'}
-        ${reservation.status === IN_PROGRESS && 'bg-green-200'}
-        ${reservation.status === DONE && 'bg-gray-200'}
-      `}
-      style={forOverlay ? { transform: 'rotate(3deg)' } : {}}
+      className={`p-1 rounded-md shadow-xl select-none ${opacityClass} ${backgroundColor}`}
+      style={rotationStyle}
     >
       <div className="text-neutral-800 p-3">
         <div className="flex justify-between">

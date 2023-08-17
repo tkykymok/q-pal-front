@@ -4,17 +4,19 @@ import React, { FC, ReactNode } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import Timer from '@/components/Timer';
 import { CardStatus } from '@/constant/CardStatus';
+import { Reservation } from '@/domain/types/models/Reservation';
+import PENDING = CardStatus.PENDING;
 
 interface CardProps {
+  reservation?: Reservation;
   id: string;
-  status?: CardStatus.Status;
   children: ReactNode;
   isDraggable: boolean;
 }
 
 const DraggableCard: FC<CardProps> = ({
   id,
-  status,
+  reservation,
   children,
   isDraggable,
 }) => {
@@ -25,7 +27,9 @@ const DraggableCard: FC<CardProps> = ({
 
   return (
     <>
-      {status === CardStatus.PENDING && <Timer />}
+      {reservation?.status === PENDING && (
+        <Timer holdStartDatetime={reservation.holdStartDatetime} />
+      )}
       <div
         ref={setNodeRef}
         className={`

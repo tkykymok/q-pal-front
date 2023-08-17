@@ -35,18 +35,18 @@ const SortableColumn: FC<SortableColumnProps> = ({
         bg-white
         shadow-xl
         border-4
-        border-yellow-400
+        border-green-300
       `}
     >
       <div
         className={`
           p-5 
           flex 
-          bg-green-400
+          bg-in-progress
         `}
       >
-        <div className="flex">
-          <div className="text-neutral-700 font-bold">{title}</div>
+        <div className="flex text-neutral-700 font-medium select-none">
+          {title}
         </div>
       </div>
       <hr />

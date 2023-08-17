@@ -79,7 +79,7 @@ const StaffListArea: FC<StaffListAreaProps> = ({
     <Sidebar
       collapsed={collapsed}
       collapsedWidth="60px"
-      className="bg-blue-300"
+      className="bg-blue-100"
     >
       <div className={`flex ${justifyContent}`}>
         <ArrowIcon

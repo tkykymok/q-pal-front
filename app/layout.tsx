@@ -13,7 +13,7 @@ interface RootLayoutProps {
 const RootLayout: FC<RootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
-      <body className="flex h-screen">
+      <body className="flex h-full bg-bg-light">
           {children}
       </body>
     </html>

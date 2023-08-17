@@ -12,6 +12,7 @@ import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
 import WAITING = CardStatus.WAITING;
 import CANCELED = CardStatus.CANCELED;
+import useAppStore from '@/store/AppStore';
 
 interface ColumnProps {
   status: Status;
@@ -19,7 +20,6 @@ interface ColumnProps {
   staffId?: number | null;
   onClickHeader?: () => void;
   reservations?: Reservation[];
-  activeCard?: Reservation;
 }
 
 const DroppableColumn: FC<ColumnProps> = ({
@@ -28,11 +28,13 @@ const DroppableColumn: FC<ColumnProps> = ({
   staffId = null,
   onClickHeader,
   reservations = [],
-  activeCard,
 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: staffId ? `${status}-${staffId}` : status,
   });
+  const showPendingColumn = useAppStore((state) => state.showPendingColumn);
+  const showCancelColumn = useAppStore((state) => state.showCancelColumn);
+  const setShowColumn = useAppStore((state) => state.setShowColumn);
 
   const [renderStarted, setRenderStarted] = useState(false);
 
@@ -59,14 +61,13 @@ const DroppableColumn: FC<ColumnProps> = ({
     <div
       className={`
         m-3
-        px-5
         w-full
       `}
       key={card.reservationId}
     >
       <DraggableCard
         id={`card-${card.reservationId}`}
-        status={card.status}
+        reservation={card}
         isDraggable={isDraggable(card)}
       >
         <CardContext reservation={card} isDraggable={isDraggable(card)} />
@@ -74,104 +75,98 @@ const DroppableColumn: FC<ColumnProps> = ({
     </div>
   );
 
-  const renderCards = (staffId: number | null | undefined) => {
-    switch (status) {
-      case IN_PROGRESS:
-        return reservations.map((card) => {
-          if (card.staffId === staffId) {
-            return getCard(card);
-          }
-          return null; // staffIdが一致しない場合にはnullを返す
-        });
-      default:
-        return reservations.map((card) => getCard(card));
-    }
+  const renderCards = () => {
+    return reservations.map((card) => getCard(card));
   };
 
-  // カードの合計数を取得する
-  const getNumberOfCards = () => {
-    switch (status) {
-      case IN_PROGRESS:
-        return reservations.filter((card) => card.staffId === staffId).length;
-      default:
-        return reservations.length;
-    }
-  };
-
-  const collapsibleStatuses = [CANCELED];
+  const collapsibleStatuses = [PENDING, CANCELED];
 
   // Header
+  const statusColors = {
+    [WAITING]: 'bg-waiting',
+    [PENDING]: 'bg-pending',
+    [IN_PROGRESS]: 'bg-in-progress',
+    [DONE]: 'bg-done',
+    [CANCELED]: 'bg-cancelled',
+  };
+  const getBackgroundColor = (status: Status) => {
+    return statusColors[status] || '';
+  };
+  const backgroundColor = getBackgroundColor(status);
   const HeaderContent = () => (
-    <div className="sticky top-0 bg-white z-10">
+    <div className="sticky top-0 bg-white text-neutral-700 font-medium select-none z-10">
       <div
-        className={`
-          p-5 
-          flex 
-          justify-between
-          ${status === WAITING && 'bg-blue-400'}
-          ${status === PENDING && 'bg-neutral-300'}
-          ${status === IN_PROGRESS && 'bg-green-400'}
-          ${status === DONE && 'bg-gray-400'}
-          ${status === CANCELED && 'bg-red-400'}
-          ${isOver ? 'bg-amber-100' : ''}
-        `}
+        className={`p-5 flex justify-between ${backgroundColor}`}
         onClick={onClickHeader}
       >
         <div className="flex">
-          <div className="text-neutral-700 font-bold">{title}</div>
+          <div>{title}</div>
           {collapsibleStatuses.includes(status) && (
-            <span className="transition group-open:rotate-180 cursor-pointer">
-              <svg
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                width="24"
-              >
+            <span className="flex transition group-open:rotate-180 group-open:items-end">
+              <svg fill="none" height="24" stroke="currentColor" width="24">
                 <path d="M6 9l6 6 6-6"></path>
               </svg>
             </span>
           )}
         </div>
-        <div className="flex">{getNumberOfCards()}</div>
+        <div className="flex text-lg">{getNumberOfCards()}</div>
       </div>
       <hr />
     </div>
   );
 
+  // カードの合計数を取得する
+  const getNumberOfCards = () => {
+    return reservations.length;
+  };
+
   // Content
   const CardContent = () => (
-    <div ref={setNodeRef} className="flex flex-wrap min-h-24 py-2">
-      {renderCards(staffId)}
-    </div>
+    <div className="flex flex-wrap min-h-24 py-2 pr-5">{renderCards()}</div>
   );
 
   // 開閉可能Content
   const CollapsibleContent = () => (
-    <details className="group">
+    <details
+      className="group cursor-pointer"
+      open={isCollapsibleContentOpen()}
+      onClick={() => setShowColumn(status)}
+    >
       <summary className="list-none">
         <HeaderContent />
       </summary>
-      <CardContent />
+      {isCollapsibleContentOpen() && <CardContent />}
     </details>
   );
 
+  const isCollapsibleContentOpen = () => {
+    switch (status) {
+      case PENDING:
+        return showPendingColumn;
+      case CANCELED:
+        return showCancelColumn;
+      default:
+        return true;
+    }
+  };
+
   return (
     <div
+      ref={setNodeRef}
       className={`
         mx-3
         rounded-md
         bg-white
         shadow-xl
         overflow-y-auto
-        scrollbar-hide
         transition-all
-        duration-500
-        ease-in-out
+        duration-300
         ${renderStarted ? 'opacity-100' : 'opacity-0'}
-        ${status === WAITING && 'max-h-168'}
-        ${status === DONE && 'max-h-168'}
-        ${status === PENDING && 'max-h-60'}
+        ${status === WAITING && ''}
+        ${status === DONE && ''}
+        ${status === PENDING && ''}
+        ${status === CANCELED && ''}
+        ${isOver && 'scale-105'}
       `}
     >
       {collapsibleStatuses.includes(status) ? (

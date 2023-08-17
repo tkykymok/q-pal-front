@@ -17,7 +17,7 @@ import {
   restrictToWindowEdges,
 } from '@dnd-kit/modifiers';
 import Modal from '@/components/Modal';
-import { CardStatus } from '@/constant/CardStatus';
+import { CardStatus, ColumnType } from '@/constant/CardStatus';
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 
 const DndBoard = () => {
@@ -49,6 +49,12 @@ const DndBoard = () => {
 
   // カラムのレンダリングを一つの関数にまとめる
   const renderInProgressColumns = () => {
+    const filteredReservations = (column: ColumnType) => {
+      return reservationsMap
+        .get(IN_PROGRESS)
+        ?.filter((reservation) => reservation.staffId === column.staffId);
+    };
+
     return columns.map((column) => {
       const ColumnComponent = shouldSwitchColumn
         ? SortableColumn
@@ -60,7 +66,7 @@ const DndBoard = () => {
           staffId={column.staffId}
           title={column.title}
           onClickHeader={() => setShouldSwitchColumn(true)}
-          reservations={reservationsMap.get(IN_PROGRESS)}
+          reservations={filteredReservations(column)}
         />
       );
     });
@@ -99,7 +105,7 @@ const DndBoard = () => {
   };
 
   return (
-    <div className="w-full flex">
+    <div className="w-full h-full flex">
       <DndContext
         sensors={sensors}
         onDragEnd={handleDragEnd}
@@ -129,15 +135,14 @@ const DndBoard = () => {
           content
         </Modal>
 
-        <div className="w-full flex h-screen space-x-10">
-          <div className="flex-1 flex-col mt-3 space-y-7 ">
+        <div className="w-full flex h-full space-x-10">
+          <div className="flex-1 flex-col mt-3 space-y-7 overflow-y-auto">
             <div>
               {/* 保留カラム */}
               <DroppableColumn
                 status={CardStatus.PENDING}
                 title={CardStatus.getCardStatusTitle(CardStatus.PENDING)}
                 reservations={reservationsMap.get(CardStatus.PENDING)}
-                activeCard={activeCard}
               />
             </div>
 
@@ -156,14 +161,13 @@ const DndBoard = () => {
             {renderColumnsContext()}
           </div>
 
-          <div className="flex-1 flex-col mt-3 space-y-7 ">
+          <div className="flex-1 flex-col mt-3 space-y-7 overflow-y-auto">
             <div>
               {/* 取消カラム */}
               <DroppableColumn
                 status={CardStatus.CANCELED}
                 title={CardStatus.getCardStatusTitle(CardStatus.CANCELED)}
                 reservations={reservationsMap.get(CardStatus.CANCELED)}
-                activeCard={activeCard}
               />
             </div>
             <div>
@@ -172,7 +176,6 @@ const DndBoard = () => {
                 status={CardStatus.DONE}
                 title={CardStatus.getCardStatusTitle(CardStatus.DONE)}
                 reservations={reservationsMap.get(CardStatus.DONE)}
-                activeCard={activeCard}
               />
             </div>
           </div>

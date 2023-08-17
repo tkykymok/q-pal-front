@@ -22,9 +22,13 @@
     animation: dotFlashing 1s infinite;
 }
 
+
 html,
 body,
 :root {
-    height: 100%;
-    background-color: lightslategrey;
+    @apply h-full bg-bg-light
+}
+
+summary.list-none::-webkit-details-marker {
+    display: none;
 }

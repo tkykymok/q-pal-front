@@ -29,4 +29,6 @@ namespace ReservationResponse {
     reservationNumber: number;
     content: string;
   };
+
+  export type UpdateReservation = Reservation
 }

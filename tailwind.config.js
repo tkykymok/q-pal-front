@@ -7,6 +7,20 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundColor: {
+        'bg-light': '#F5F5F5',
+        'waiting': '#AFEEEE',
+        'waiting-child': '#E8F8F8',
+        'in-progress': '#FFE4B5',
+        'in-progress-child': '#FFF5CC',
+        'done': '#90EE90',
+        'done-child': '#E5F4E5',
+        'cancelled': '#FFC0CB',
+        'cancelled-child': '#FFE0E0',
+        'pending': '#E6E6FA',
+        'pending-child': '#F2F2FA',
+        'drag-child': '#98FB98',
+      },
       minHeight: {
         20: '5rem',
         24: '6rem',
