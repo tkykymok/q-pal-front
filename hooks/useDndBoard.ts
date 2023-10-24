@@ -35,7 +35,7 @@ export const useDndBoard = () => {
 
   const activationOptions = {
     activationConstraint: {
-      delay: isBrowser ? 0 : 100, // タブレットの場合、ドラッグ時の遅延を設定
+      delay: isBrowser ? 0 : 0, // タブレットの場合、ドラッグ時の遅延を設定 TODO 遅延設定不要？
       tolerance: 0,
     },
   };
