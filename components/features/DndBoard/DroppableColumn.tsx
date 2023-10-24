@@ -171,7 +171,7 @@ const DroppableColumn: FC<ColumnProps> = ({
         ${
           isOver &&
           (activeCard?.status !== status || activeCard.staffId !== staffId) &&
-          'scale-105'
+          'border-2 border-green-400'
         }
       `}
     >
