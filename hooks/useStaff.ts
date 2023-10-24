@@ -4,11 +4,12 @@ import useSWR, { mutate } from 'swr';
 import { Staff } from '@/domain/types/models/Staff';
 import { useEffect, useMemo, useState } from 'react';
 import { Reservation } from '@/domain/types/models/Reservation';
-import { CardStatus, ColumnType } from '@/constant/CardStatus';
+import { CardStatus } from '@/constant/CardStatus';
 import Status = CardStatus.Status;
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
 import UpdateActiveStaffsData = StaffRequest.UpdateActiveStaffsData;
+import {ColumnType} from '@/domain/types/models/ColumnType';
 
 export const useStaff = (reservationsMap: Map<Status, Reservation[]>) => {
   const [staffUsecase, setStaffUsecase] = useState<IStaffUsecase>();

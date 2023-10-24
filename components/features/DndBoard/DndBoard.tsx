@@ -17,8 +17,9 @@ import {
   restrictToWindowEdges,
 } from '@dnd-kit/modifiers';
 import Modal from '@/components/Modal';
-import { CardStatus, ColumnType } from '@/constant/CardStatus';
+import { CardStatus } from '@/constant/CardStatus';
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
+import { ColumnType } from '@/domain/types/models/ColumnType';
 
 const DndBoard = () => {
   const {
@@ -66,6 +67,7 @@ const DndBoard = () => {
           title={column.title}
           onClickHeader={() => setShouldSwitchColumn(true)}
           reservations={filteredReservations(column)}
+          activeCard={activeCard}
         />
       );
     });
@@ -142,6 +144,7 @@ const DndBoard = () => {
                 status={CardStatus.PENDING}
                 title={CardStatus.getCardStatusTitle(CardStatus.PENDING)}
                 reservations={reservationsMap.get(CardStatus.PENDING)}
+                activeCard={activeCard}
               />
             </div>
 
@@ -151,6 +154,7 @@ const DndBoard = () => {
                 status={CardStatus.WAITING}
                 title={CardStatus.getCardStatusTitle(CardStatus.WAITING)}
                 reservations={reservationsMap.get(CardStatus.WAITING)}
+                activeCard={activeCard}
               />
             </div>
           </div>
@@ -167,6 +171,7 @@ const DndBoard = () => {
                 status={CardStatus.CANCELED}
                 title={CardStatus.getCardStatusTitle(CardStatus.CANCELED)}
                 reservations={reservationsMap.get(CardStatus.CANCELED)}
+                activeCard={activeCard}
               />
             </div>
             <div>
@@ -175,6 +180,7 @@ const DndBoard = () => {
                 status={CardStatus.DONE}
                 title={CardStatus.getCardStatusTitle(CardStatus.DONE)}
                 reservations={reservationsMap.get(CardStatus.DONE)}
+                activeCard={activeCard}
               />
             </div>
           </div>

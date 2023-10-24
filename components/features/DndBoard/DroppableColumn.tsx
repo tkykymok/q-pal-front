@@ -12,7 +12,7 @@ import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
 import WAITING = CardStatus.WAITING;
 import CANCELED = CardStatus.CANCELED;
-import useAppStore from '@/store/AppStore';
+import useBoardStore from '@/store/BoardStore';
 
 interface ColumnProps {
   status: Status;
@@ -20,6 +20,7 @@ interface ColumnProps {
   staffId?: number | null;
   onClickHeader?: () => void;
   reservations?: Reservation[];
+  activeCard?: Reservation;
 }
 
 const DroppableColumn: FC<ColumnProps> = ({
@@ -28,13 +29,14 @@ const DroppableColumn: FC<ColumnProps> = ({
   staffId = null,
   onClickHeader,
   reservations = [],
+  activeCard,
 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: staffId ? `${status}-${staffId}` : status,
   });
-  const showPendingColumn = useAppStore((state) => state.showPendingColumn);
-  const showCancelColumn = useAppStore((state) => state.showCancelColumn);
-  const setShowColumn = useAppStore((state) => state.setShowColumn);
+  const showPendingColumn = useBoardStore((state) => state.showPendingColumn);
+  const showCancelColumn = useBoardStore((state) => state.showCancelColumn);
+  const setShowColumn = useBoardStore((state) => state.setShowColumn);
 
   const [renderStarted, setRenderStarted] = useState(false);
 
@@ -166,7 +168,11 @@ const DroppableColumn: FC<ColumnProps> = ({
         ${status === DONE && ''}
         ${status === PENDING && ''}
         ${status === CANCELED && ''}
-        ${isOver && 'scale-105'}
+        ${
+          isOver &&
+          (activeCard?.status !== status || activeCard.staffId !== staffId) &&
+          'scale-105'
+        }
       `}
     >
       {collapsibleStatuses.includes(status) ? (

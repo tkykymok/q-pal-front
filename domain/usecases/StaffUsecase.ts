@@ -43,7 +43,12 @@ export class StaffUsecase implements IStaffUsecase {
   async removeActiveStaff(
     request: StaffRequest.RemoveActiveStaff
   ): Promise<void> {
-    await this.repository.removeActiveStaff(request);
-    return Promise.resolve(undefined);
+    try {
+      await this.repository.removeActiveStaff(request);
+      return Promise.resolve(undefined);
+    } catch (e) {
+      // 共通エラーでメッセージを設定するため、何もしない。
+      return Promise.resolve(undefined);
+    }
   }
 }

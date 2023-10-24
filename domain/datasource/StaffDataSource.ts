@@ -6,7 +6,7 @@ import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
 import CreateActiveStaff = StaffRequest.CreateActiveStaff;
 import RemoveActiveStaff = StaffRequest.RemoveActiveStaff;
 
-export interface IStaffRepository {
+export interface IStaffDataSource {
   getStaffs(): Promise<ApiResponse<GetStaffs>>;
 
   createActiveStaff(request: CreateActiveStaff): Promise<ApiResponse<unknown>>;
@@ -19,7 +19,7 @@ export interface IStaffRepository {
 }
 
 @injectable()
-export class StaffRepository implements IStaffRepository {
+export class StaffDataSource implements IStaffDataSource {
   constructor(@inject('IAxiosInstance') private axiosInstance: AxiosInstance) {}
 
   async getStaffs(): Promise<ApiResponse<GetStaffs>> {
@@ -50,13 +50,9 @@ export class StaffRepository implements IStaffRepository {
   async removeActiveStaff(
     request: StaffRequest.RemoveActiveStaff
   ): Promise<ApiResponse<unknown>> {
-    try {
-      const response = await this.axiosInstance.instance.delete(
-        `/remove-active-staff/${request.staffId}`
-      );
-      return response.data;
-    } catch (e) {
-      return Promise.reject(e)
-    }
+    const response = await this.axiosInstance.instance.delete(
+      `/remove-active-staff/${request.staffId}`
+    );
+    return response.data;
   }
 }

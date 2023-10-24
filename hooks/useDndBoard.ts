@@ -8,7 +8,7 @@ import {
 } from '@dnd-kit/core';
 import { DragStartEvent } from '@dnd-kit/core/dist/types/events';
 import { arrayMove } from '@dnd-kit/sortable';
-import { CardStatus, ColumnType } from '@/constant/CardStatus';
+import { CardStatus } from '@/constant/CardStatus';
 import { Reservation } from '@/domain/types/models/Reservation';
 import { isBrowser } from 'react-device-detect';
 import { useReservation } from '@/hooks/useReservation';
@@ -16,6 +16,7 @@ import { useStaff } from '@/hooks/useStaff';
 import Status = CardStatus.Status;
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
+import {ColumnType} from '@/domain/types/models/ColumnType';
 
 export const useDndBoard = () => {
   const [activeCard, setActiveCard] = useState<Reservation>();
