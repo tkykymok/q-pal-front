@@ -47,10 +47,6 @@ const Toast: FC<ToastProps> = ({ content, type }) => {
   return (
     <div
       className={`
-        absolute 
-        z-30
-        top-1.5
-        right-1.5
         justify-center
         flex
         items-center
