@@ -1,22 +1,26 @@
 import { inject, injectable } from 'inversify';
-import GetReservations = ReservationResponse.GetReservations;
-import GetWaitingInfo = ReservationResponse.GetWaitingInfo;
-import CreateReservationReq = ReservationRequest.CreateReservation;
-import CreateReservationRes = ReservationResponse.CreateReservation;
 import { AxiosInstance } from '@/config/axios';
-import ApiResponse = CommonResponse.ApiResponse;
-import GetMyWaitingInfo = ReservationRequest.GetMyWaitingInfo;
-import UpdateReservationReq = ReservationRequest.UpdateReservation;
-import UpdateReservationRes = ReservationResponse.UpdateReservation
+import { ApiResponse } from '@/domain/types/responses/CommonResponse';
+import {
+  CreateReservationRes,
+  GetReservationsRes,
+  GetWaitingInfoRes,
+  UpdateReservationRes,
+} from '@/domain/types/responses/ReservationResponse';
+import {
+  CreateReservationReq,
+  GetMyWaitingInfoReq,
+  UpdateReservationReq,
+} from '@/domain/types/requests/ReservationRequest';
 
 export interface IReservationRepository {
-  getTodayReservations(): Promise<ApiResponse<GetReservations>>;
+  getTodayReservations(): Promise<ApiResponse<GetReservationsRes>>;
 
-  getLineEndWaitingInfo(): Promise<ApiResponse<GetWaitingInfo>>;
+  getLineEndWaitingInfo(): Promise<ApiResponse<GetWaitingInfoRes>>;
 
   getMyWaitingInfo(
-    request: GetMyWaitingInfo
-  ): Promise<ApiResponse<GetWaitingInfo>>;
+    request: GetMyWaitingInfoReq
+  ): Promise<ApiResponse<GetWaitingInfoRes>>;
 
   createReservation(
     request: CreateReservationReq
@@ -31,12 +35,12 @@ export interface IReservationRepository {
 export class ReservationRepository implements IReservationRepository {
   constructor(@inject('IAxiosInstance') private axiosInstance: AxiosInstance) {}
 
-  async getTodayReservations(): Promise<ApiResponse<GetReservations>> {
+  async getTodayReservations(): Promise<ApiResponse<GetReservationsRes>> {
     const response = await this.axiosInstance.instance.get('/reservations/today');
     return response.data;
   }
 
-  async getLineEndWaitingInfo(): Promise<ApiResponse<GetWaitingInfo>> {
+  async getLineEndWaitingInfo(): Promise<ApiResponse<GetWaitingInfoRes>> {
     const response = await this.axiosInstance.instance.get(
       '/reservations/line-end-wait-time'
     );
@@ -44,8 +48,8 @@ export class ReservationRepository implements IReservationRepository {
   }
 
   async getMyWaitingInfo(
-    request: GetMyWaitingInfo
-  ): Promise<ApiResponse<GetWaitingInfo>> {
+    request: GetMyWaitingInfoReq
+  ): Promise<ApiResponse<GetWaitingInfoRes>> {
     const response = await this.axiosInstance.instance.get(
       '/reservations/my-wait-time',
       {

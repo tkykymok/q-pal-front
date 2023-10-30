@@ -16,7 +16,8 @@ import { useStaff } from '@/hooks/useStaff';
 import Status = CardStatus.Status;
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
 import DONE = CardStatus.DONE;
-import {ColumnType} from '@/domain/types/models/ColumnType';
+import { ColumnType } from '@/domain/types/models/ColumnType';
+import { useMenu } from '@/hooks/useMenu';
 
 export const useDndBoard = () => {
   const [activeCard, setActiveCard] = useState<Reservation>();
@@ -32,6 +33,8 @@ export const useDndBoard = () => {
   // スタッフカスタムHook
   const { staffs, servingStaffIdList, updateActiveStaffs } =
     useStaff(reservationsMap);
+  //  メニューカスタムHook
+  const { menus } = useMenu();
 
   const activationOptions = {
     activationConstraint: {
@@ -95,11 +98,15 @@ export const useDndBoard = () => {
       //   return;
       // }
 
-      // 案内済みへは案内中からのみ移動可能
+      // 案内済み
       if (overType === DONE && activeId) {
+        // 案内済みへは案内中からのみ移動可能
         if (activeCard?.status !== IN_PROGRESS) {
           return;
         }
+
+        // メニュー一覧を取得する
+
         setBeforeUpdate(activeCard);
 
         setTimeout(() => {
@@ -172,6 +179,7 @@ export const useDndBoard = () => {
     setIsModalOpen,
     staffs,
     // staffsMutate,
+    menus,
     columns,
     setColumns,
     reservationsMap,

@@ -7,28 +7,23 @@ import { Reservation } from '@/domain/types/models/Reservation';
 import { CardStatus } from '@/constant/CardStatus';
 import Status = CardStatus.Status;
 import IN_PROGRESS = CardStatus.IN_PROGRESS;
-import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
-import UpdateActiveStaffsData = StaffRequest.UpdateActiveStaffsData;
-import {ColumnType} from '@/domain/types/models/ColumnType';
+import { ColumnType } from '@/domain/types/models/ColumnType';
+import {
+  UpdateActiveStaffsData,
+  UpdateActiveStaffsReq,
+} from '@/domain/types/requests/StaffRequest';
 
 export const useStaff = (reservationsMap: Map<Status, Reservation[]>) => {
-  const [staffUsecase, setStaffUsecase] = useState<IStaffUsecase>();
-  useEffect(() => {
-    const usecase = container.get<IStaffUsecase>('IStaffUsecase');
-    setStaffUsecase(usecase);
-  }, []);
+  const staffUsecase = container.get<IStaffUsecase>('IStaffUsecase');
 
   /**
    * スタッフ一覧を取得する
    */
   const fetchStaffs = async () => {
-    if (!staffUsecase) return [] as Staff[]; // staffUsecase がまだセットされていない場合は空の配列を返す
     return await staffUsecase.getStaffs();
   };
 
-  const {
-    data: staffs,
-  } = useSWR<Staff[]>(staffUsecase ? 'staffs' : null, fetchStaffs);
+  const { data: staffs } = useSWR<Staff[]>('staffs', fetchStaffs);
 
   // 接客中スタッフID一覧
   const servingStaffIdList = useMemo(() => {
@@ -57,7 +52,7 @@ export const useStaff = (reservationsMap: Map<Status, Reservation[]>) => {
         return staff;
       });
 
-    const request: UpdateActiveStaffs = {
+    const request: UpdateActiveStaffsReq = {
       data: [],
     };
     newActiveStaffList.forEach((staff) => {

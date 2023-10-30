@@ -19,6 +19,8 @@ import {
 } from '@/domain/repository/ReservationRepository';
 import {IStaffUsecase, StaffUsecase} from '@/domain/usecases/StaffUsecase';
 import {IStaffRepository, StaffRepository} from '@/domain/repository/StaffRepository';
+import {IMenuUsecase, MenuUsecase} from "@/domain/usecases/MenuUsecase";
+import {IMenuRepository, MenuRepository} from "@/domain/repository/MenuRepository";
 
 const container = new Container();
 container.bind<IAxiosInstance>('IAxiosInstance').to(AxiosInstance);
@@ -42,5 +44,13 @@ container
 container
   .bind<IStaffRepository>('IStaffRepository')
   .to(StaffRepository);
+
+// Menu
+container
+  .bind<IMenuUsecase>('IMenuUsecase')
+  .to(MenuUsecase);
+container
+  .bind<IMenuRepository>('IMenuRepository')
+  .to(MenuRepository);
 
 export default container;

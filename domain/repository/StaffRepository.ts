@@ -1,34 +1,32 @@
 import { inject, injectable } from 'inversify';
 import { AxiosInstance } from '@/config/axios';
-import ApiResponse = CommonResponse.ApiResponse;
-import GetStaffs = ReservationResponse.GetStaffs;
-import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
-import CreateActiveStaff = StaffRequest.CreateActiveStaff;
-import RemoveActiveStaff = StaffRequest.RemoveActiveStaff;
+import {ApiResponse} from "@/domain/types/responses/CommonResponse";
+import {GetStaffsRes} from "@/domain/types/responses/StaffResponse";
+import {CreateActiveStaffReq, RemoveActiveStaffReq, UpdateActiveStaffsReq} from "@/domain/types/requests/StaffRequest";
 
 export interface IStaffRepository {
-  getStaffs(): Promise<ApiResponse<GetStaffs>>;
+  getStaffs(): Promise<ApiResponse<GetStaffsRes>>;
 
-  createActiveStaff(request: CreateActiveStaff): Promise<ApiResponse<unknown>>;
+  createActiveStaff(request: CreateActiveStaffReq): Promise<ApiResponse<unknown>>;
 
   updateActiveStaffs(
-    request: UpdateActiveStaffs
+    request: UpdateActiveStaffsReq
   ): Promise<ApiResponse<unknown>>;
 
-  removeActiveStaff(request: RemoveActiveStaff): Promise<ApiResponse<unknown>>;
+  removeActiveStaff(request: RemoveActiveStaffReq): Promise<ApiResponse<unknown>>;
 }
 
 @injectable()
 export class StaffRepository implements IStaffRepository {
   constructor(@inject('IAxiosInstance') private axiosInstance: AxiosInstance) {}
 
-  async getStaffs(): Promise<ApiResponse<GetStaffs>> {
+  async getStaffs(): Promise<ApiResponse<GetStaffsRes>> {
     const response = await this.axiosInstance.instance.get('/staffs');
     return response.data;
   }
 
   async createActiveStaff(
-    request: StaffRequest.CreateActiveStaff
+    request: CreateActiveStaffReq
   ): Promise<ApiResponse<unknown>> {
     const response = await this.axiosInstance.instance.post(
       '/create-active-staff',
@@ -38,7 +36,7 @@ export class StaffRepository implements IStaffRepository {
   }
 
   async updateActiveStaffs(
-    request: StaffRequest.UpdateActiveStaffs
+    request: UpdateActiveStaffsReq
   ): Promise<ApiResponse<unknown>> {
     const response = await this.axiosInstance.instance.put(
       '/update-active-staffs',
@@ -48,7 +46,7 @@ export class StaffRepository implements IStaffRepository {
   }
 
   async removeActiveStaff(
-    request: StaffRequest.RemoveActiveStaff
+    request: RemoveActiveStaffReq
   ): Promise<ApiResponse<unknown>> {
     try {
       const response = await this.axiosInstance.instance.delete(
@@ -56,7 +54,7 @@ export class StaffRepository implements IStaffRepository {
       );
       return response.data;
     } catch (e) {
-      return Promise.reject(e)
+      return Promise.reject(e);
     }
   }
 }

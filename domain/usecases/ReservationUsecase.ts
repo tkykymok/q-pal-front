@@ -1,18 +1,19 @@
 import { inject, injectable } from 'inversify';
 import type { IReservationRepository } from '@/domain/repository/ReservationRepository';
-import CreateReservationReq = ReservationRequest.CreateReservation;
-import CreateReservationRes = ReservationResponse.CreateReservation;
 import { Reservation, WaitingInfo } from '@/domain/types/models/Reservation';
-import GetMyWaitingInfo = ReservationRequest.GetMyWaitingInfo;
-import UpdateReservationReq = ReservationRequest.UpdateReservation;
-import UpdateReservationRes = ReservationResponse.UpdateReservation;
+import {
+  CreateReservationReq,
+  GetMyWaitingInfoReq,
+  UpdateReservationReq
+} from "@/domain/types/requests/ReservationRequest";
+import {CreateReservationRes, UpdateReservationRes} from "@/domain/types/responses/ReservationResponse";
 
 export interface IReservationUsecase {
   getTodayReservations(): Promise<Reservation[]>;
 
   getLineEndWaitingInfo(): Promise<WaitingInfo>;
 
-  getMyWaitingInfo(request: GetMyWaitingInfo): Promise<WaitingInfo>;
+  getMyWaitingInfo(request: GetMyWaitingInfoReq): Promise<WaitingInfo>;
 
   createReservation(
     request: CreateReservationReq
@@ -39,7 +40,7 @@ export class ReservationUsecase implements IReservationUsecase {
     return response.data as WaitingInfo;
   }
 
-  async getMyWaitingInfo(request: GetMyWaitingInfo): Promise<WaitingInfo> {
+  async getMyWaitingInfo(request: GetMyWaitingInfoReq): Promise<WaitingInfo> {
     const response = await this.repository.getMyWaitingInfo(request);
     return response.data as WaitingInfo;
   }

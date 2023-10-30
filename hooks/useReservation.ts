@@ -2,31 +2,25 @@ import container from '@/config/di';
 import { IReservationUsecase } from '@/domain/usecases/ReservationUsecase';
 import useSWR, { mutate } from 'swr';
 import { Reservation } from '@/domain/types/models/Reservation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { CardStatus } from '@/constant/CardStatus';
+import { UpdateReservationReq } from '@/domain/types/requests/ReservationRequest';
 import DONE = CardStatus.DONE;
 import Status = CardStatus.Status;
-import UpdateReservation = ReservationRequest.UpdateReservation;
 
 export const useReservation = () => {
-  const [reservationUsecase, setReservationUsecase] =
-    useState<IReservationUsecase>();
-  useEffect(() => {
-    const usecase = container.get<IReservationUsecase>('IReservationUsecase');
-    setReservationUsecase(usecase);
-  }, []);
+  const reservationUsecase = container.get<IReservationUsecase>(
+    'IReservationUsecase'
+  );
 
   /**
    * 今日の予約一覧を取得する
    */
   const fetchTodayReservations = async () => {
-    if (!reservationUsecase) return [] as Reservation[]; //
     return await reservationUsecase.getTodayReservations();
   };
-  const {
-    data: reservations,
-  } = useSWR<Reservation[]>(
-    reservationUsecase ? 'reservations' : null,
+  const { data: reservations } = useSWR<Reservation[]>(
+    'reservations',
     fetchTodayReservations
   );
 
@@ -71,7 +65,7 @@ export const useReservation = () => {
     // ステータスに変更がないかつスタッフIDが指定されてない場合、何もしない(別のスタッフに移動した場合の考慮)
     if (newStatus === oldStatus && !staffId) return;
 
-    const request: UpdateReservation = {
+    const request: UpdateReservationReq = {
       reservationId: reservationId,
       status: newStatus,
       staffId: staffId,

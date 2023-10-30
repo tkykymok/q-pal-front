@@ -32,6 +32,7 @@ const DndBoard = () => {
     beforeUpdate,
     setIsModalOpen,
     staffs,
+    menus,
     columns,
     reservationsMap,
     servingStaffIdList,
@@ -128,11 +129,15 @@ const DndBoard = () => {
           )}
         </DragOverlay>
 
+        {/* 案内済みモーダル */}
         <Modal
           isOpen={isModalOpen}
           onOk={() => handleConfirm()}
           onCancel={() => handleCancel(beforeUpdate!)}
         >
+          {menus?.map((menu) => (
+            <div key={menu.menuId}>{menu.manuName}</div>
+          ))}
           content
         </Modal>
 

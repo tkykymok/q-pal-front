@@ -1,18 +1,16 @@
 import { inject, injectable } from 'inversify';
 import { Staff } from '@/domain/types/models/Staff';
 import type { IStaffRepository } from '@/domain/repository/StaffRepository';
-import UpdateActiveStaffs = StaffRequest.UpdateActiveStaffs;
-import CreateActiveStaff = StaffRequest.CreateActiveStaff;
-import RemoveActiveStaff = StaffRequest.RemoveActiveStaff;
+import {CreateActiveStaffReq, RemoveActiveStaffReq, UpdateActiveStaffsReq} from "@/domain/types/requests/StaffRequest";
 
 export interface IStaffUsecase {
   getStaffs(): Promise<Staff[]>;
 
-  createActiveStaff(request: CreateActiveStaff): Promise<void>;
+  createActiveStaff(request: CreateActiveStaffReq): Promise<void>;
 
-  updateActiveStaffs(request: UpdateActiveStaffs): Promise<void>;
+  updateActiveStaffs(request: UpdateActiveStaffsReq): Promise<void>;
 
-  removeActiveStaff(request: RemoveActiveStaff): Promise<void>;
+  removeActiveStaff(request: RemoveActiveStaffReq): Promise<void>;
 }
 
 @injectable()
@@ -27,21 +25,21 @@ export class StaffUsecase implements IStaffUsecase {
   }
 
   async createActiveStaff(
-    request: StaffRequest.CreateActiveStaff
+    request: CreateActiveStaffReq
   ): Promise<void> {
     await this.repository.createActiveStaff(request);
     return Promise.resolve(undefined);
   }
 
   async updateActiveStaffs(
-    request: StaffRequest.UpdateActiveStaffs
+    request: UpdateActiveStaffsReq
   ): Promise<void> {
     await this.repository.updateActiveStaffs(request);
     return Promise.resolve(undefined);
   }
 
   async removeActiveStaff(
-    request: StaffRequest.RemoveActiveStaff
+    request: RemoveActiveStaffReq
   ): Promise<void> {
     try {
       await this.repository.removeActiveStaff(request);

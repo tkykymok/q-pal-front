@@ -1,18 +1,16 @@
-namespace StaffRequest {
-  export type CreateActiveStaff = {
-    staffId: number;
-  };
+export type CreateActiveStaffReq = {
+  staffId: number;
+};
 
-  export type UpdateActiveStaffsData = {
-    staffId: number;
-    order: number;
-  };
+export type UpdateActiveStaffsData = {
+  staffId: number;
+  order: number;
+};
 
-  export type UpdateActiveStaffs = {
-    data: UpdateActiveStaffsData[];
-  };
+export type UpdateActiveStaffsReq = {
+  data: UpdateActiveStaffsData[];
+};
 
-  export type RemoveActiveStaff = {
-    staffId: number;
-  };
-}
+export type RemoveActiveStaffReq = {
+  staffId: number;
+};
