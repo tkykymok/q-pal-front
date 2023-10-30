@@ -1,6 +1,5 @@
 import container from '@/config/di';
 import useSWR from 'swr';
-import { CardStatus } from '@/constant/CardStatus';
 import { IMenuUsecase } from '@/domain/usecases/MenuUsecase';
 import { Menu } from '@/domain/types/models/Menu';
 
